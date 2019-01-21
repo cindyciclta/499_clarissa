@@ -3,7 +3,7 @@
 #include <string>
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
-
+#include "User.h"
 
 using grpc::Server;
 using grpc::ServerBuilder;
@@ -18,7 +18,15 @@ using chirp::GetRequest;
 using chirp::DeleteRequest;
 using chirp::DeleteReply;
 class ChirpImpl final : public KeyValueStore::Service {
-	Status put(ServerContext* context, const PutRequest* request, PutReply* response) {
+
+    //testing implementation with dummy values
+	Status put(ServerContext* context, const PutRequest* request, PutReply* response) override{
+        std::cout << request->key() << std::endl;
+        std::cout << request->value() << std::endl;
+        User user(request->key());
+
+        dataUsers.push_back(user);
+        std::cout << dataUsers.size() << std::endl;
 		return Status::OK;
 	}
     Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
@@ -26,13 +34,7 @@ class ChirpImpl final : public KeyValueStore::Service {
     	GetRequest request;
     	while(stream->Read(&request)){
     		for(const GetRequest& r : received_notes){
-    			// if(r.key == 1 && r.value == 2){
-    			// 	std::cout << "equals"<<std::endl;
-    			// }
-    			// GetReply e;
-    			// std::string huh = "huh";
-    			// e.value() = huh;
-    			// stream->Write(e);
+    			//unsure what to do here
     		}
     		received_notes.push_back(request);
     	}
@@ -42,11 +44,14 @@ class ChirpImpl final : public KeyValueStore::Service {
     Status Delete(ServerContext* context, const DeleteRequest* request, DeleteReply* response){
     	return Status::OK;
     }
-	//Do I make 3 Status? for put, get, delete requests?
+
+    //DATA SAVED HERE
+    std::vector<User> dataUsers; 
 };
 
 void RunServer(){
 	std::string server_address("0.0.0.0:50000");
+
 	ChirpImpl service;
 	ServerBuilder builder;
 	builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

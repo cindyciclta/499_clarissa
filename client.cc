@@ -24,7 +24,20 @@ class Client{
 public:
 	Client(std::shared_ptr<Channel> channel) :stub_(KeyValueStore::NewStub(channel)){}
 	void put(std::string key, std::string value) {
+		chirp::PutRequest request;
+		request.set_key(key);
+		request.set_value(value);
 
+		chirp::PutReply reply;
+
+		ClientContext context;
+		Status status = stub_->put(&context, request, &reply);
+
+		if (status.ok()){
+			std::cout << "status is ok" << std::endl;
+		}else {
+			std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+		}
 	}
     std::string get(std::string key) {
   
@@ -38,9 +51,8 @@ private:
 };
 int main(int argc, char** argv){
 
-	Client client(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
-	// std::string reply = client.get(1);
-	std::cout << "received: "<<std::endl;
+	Client client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
+	client.put("keyyyyy", "valueeee");
 
 	return 0;
 }
