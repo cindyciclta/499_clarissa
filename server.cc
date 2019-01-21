@@ -22,6 +22,21 @@ class ChirpImpl final : public KeyValueStore::Service {
 		return Status::OK;
 	}
     Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
+    	std::vector<GetRequest> received_notes;
+    	GetRequest request;
+    	while(stream->Read(&request)){
+    		for(const GetRequest& r : received_notes){
+    			// if(r.key == 1 && r.value == 2){
+    			// 	std::cout << "equals"<<std::endl;
+    			// }
+    			// GetReply e;
+    			// std::string huh = "huh";
+    			// e.value() = huh;
+    			// stream->Write(e);
+    		}
+    		received_notes.push_back(request);
+    	}
+
     	return Status::OK;
     }
     Status Delete(ServerContext* context, const DeleteRequest* request, DeleteReply* response){

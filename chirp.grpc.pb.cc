@@ -21,7 +21,12 @@ namespace chirp {
 static const char* KeyValueStore_method_names[] = {
   "/chirp.KeyValueStore/put",
   "/chirp.KeyValueStore/get",
-  "/chirp.KeyValueStore/Delete",
+  "/chirp.KeyValueStore/deletekey",
+  "/chirp.KeyValueStore/registeruser",
+  "/chirp.KeyValueStore/chirp",
+  "/chirp.KeyValueStore/follow",
+  "/chirp.KeyValueStore/read",
+  "/chirp.KeyValueStore/monitor",
 };
 
 std::unique_ptr< KeyValueStore::Stub> KeyValueStore::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -33,7 +38,12 @@ std::unique_ptr< KeyValueStore::Stub> KeyValueStore::NewStub(const std::shared_p
 KeyValueStore::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_put_(KeyValueStore_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_get_(KeyValueStore_method_names[1], ::grpc::internal::RpcMethod::BIDI_STREAMING, channel)
-  , rpcmethod_Delete_(KeyValueStore_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_deletekey_(KeyValueStore_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_registeruser_(KeyValueStore_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_chirp_(KeyValueStore_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_follow_(KeyValueStore_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_read_(KeyValueStore_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_monitor_(KeyValueStore_method_names[7], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   {}
 
 ::grpc::Status KeyValueStore::Stub::put(::grpc::ClientContext* context, const ::chirp::PutRequest& request, ::chirp::PutReply* response) {
@@ -64,20 +74,96 @@ void KeyValueStore::Stub::experimental_async::put(::grpc::ClientContext* context
   return ::grpc::internal::ClientAsyncReaderWriterFactory< ::chirp::GetRequest, ::chirp::GetReply>::Create(channel_.get(), cq, rpcmethod_get_, context, false, nullptr);
 }
 
-::grpc::Status KeyValueStore::Stub::Delete(::grpc::ClientContext* context, const ::chirp::DeleteRequest& request, ::chirp::DeleteReply* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Delete_, context, request, response);
+::grpc::Status KeyValueStore::Stub::deletekey(::grpc::ClientContext* context, const ::chirp::DeleteRequest& request, ::chirp::DeleteReply* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_deletekey_, context, request, response);
 }
 
-void KeyValueStore::Stub::experimental_async::Delete(::grpc::ClientContext* context, const ::chirp::DeleteRequest* request, ::chirp::DeleteReply* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_Delete_, context, request, response, std::move(f));
+void KeyValueStore::Stub::experimental_async::deletekey(::grpc::ClientContext* context, const ::chirp::DeleteRequest* request, ::chirp::DeleteReply* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_deletekey_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::chirp::DeleteReply>* KeyValueStore::Stub::AsyncDeleteRaw(::grpc::ClientContext* context, const ::chirp::DeleteRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::DeleteReply>::Create(channel_.get(), cq, rpcmethod_Delete_, context, request, true);
+::grpc::ClientAsyncResponseReader< ::chirp::DeleteReply>* KeyValueStore::Stub::AsyncdeletekeyRaw(::grpc::ClientContext* context, const ::chirp::DeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::DeleteReply>::Create(channel_.get(), cq, rpcmethod_deletekey_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::chirp::DeleteReply>* KeyValueStore::Stub::PrepareAsyncDeleteRaw(::grpc::ClientContext* context, const ::chirp::DeleteRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::DeleteReply>::Create(channel_.get(), cq, rpcmethod_Delete_, context, request, false);
+::grpc::ClientAsyncResponseReader< ::chirp::DeleteReply>* KeyValueStore::Stub::PrepareAsyncdeletekeyRaw(::grpc::ClientContext* context, const ::chirp::DeleteRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::DeleteReply>::Create(channel_.get(), cq, rpcmethod_deletekey_, context, request, false);
+}
+
+::grpc::Status KeyValueStore::Stub::registeruser(::grpc::ClientContext* context, const ::chirp::RegisterRequest& request, ::chirp::RegisterReply* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_registeruser_, context, request, response);
+}
+
+void KeyValueStore::Stub::experimental_async::registeruser(::grpc::ClientContext* context, const ::chirp::RegisterRequest* request, ::chirp::RegisterReply* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_registeruser_, context, request, response, std::move(f));
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::RegisterReply>* KeyValueStore::Stub::AsyncregisteruserRaw(::grpc::ClientContext* context, const ::chirp::RegisterRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::RegisterReply>::Create(channel_.get(), cq, rpcmethod_registeruser_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::RegisterReply>* KeyValueStore::Stub::PrepareAsyncregisteruserRaw(::grpc::ClientContext* context, const ::chirp::RegisterRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::RegisterReply>::Create(channel_.get(), cq, rpcmethod_registeruser_, context, request, false);
+}
+
+::grpc::Status KeyValueStore::Stub::chirp(::grpc::ClientContext* context, const ::chirp::ChirpRequest& request, ::chirp::ChirpReply* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_chirp_, context, request, response);
+}
+
+void KeyValueStore::Stub::experimental_async::chirp(::grpc::ClientContext* context, const ::chirp::ChirpRequest* request, ::chirp::ChirpReply* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_chirp_, context, request, response, std::move(f));
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::ChirpReply>* KeyValueStore::Stub::AsyncchirpRaw(::grpc::ClientContext* context, const ::chirp::ChirpRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::ChirpReply>::Create(channel_.get(), cq, rpcmethod_chirp_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::ChirpReply>* KeyValueStore::Stub::PrepareAsyncchirpRaw(::grpc::ClientContext* context, const ::chirp::ChirpRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::ChirpReply>::Create(channel_.get(), cq, rpcmethod_chirp_, context, request, false);
+}
+
+::grpc::Status KeyValueStore::Stub::follow(::grpc::ClientContext* context, const ::chirp::FollowRequest& request, ::chirp::FollowReply* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_follow_, context, request, response);
+}
+
+void KeyValueStore::Stub::experimental_async::follow(::grpc::ClientContext* context, const ::chirp::FollowRequest* request, ::chirp::FollowReply* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_follow_, context, request, response, std::move(f));
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::FollowReply>* KeyValueStore::Stub::AsyncfollowRaw(::grpc::ClientContext* context, const ::chirp::FollowRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::FollowReply>::Create(channel_.get(), cq, rpcmethod_follow_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::FollowReply>* KeyValueStore::Stub::PrepareAsyncfollowRaw(::grpc::ClientContext* context, const ::chirp::FollowRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::FollowReply>::Create(channel_.get(), cq, rpcmethod_follow_, context, request, false);
+}
+
+::grpc::Status KeyValueStore::Stub::read(::grpc::ClientContext* context, const ::chirp::ReadRequest& request, ::chirp::ReadReply* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_read_, context, request, response);
+}
+
+void KeyValueStore::Stub::experimental_async::read(::grpc::ClientContext* context, const ::chirp::ReadRequest* request, ::chirp::ReadReply* response, std::function<void(::grpc::Status)> f) {
+  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_read_, context, request, response, std::move(f));
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::ReadReply>* KeyValueStore::Stub::AsyncreadRaw(::grpc::ClientContext* context, const ::chirp::ReadRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::ReadReply>::Create(channel_.get(), cq, rpcmethod_read_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::chirp::ReadReply>* KeyValueStore::Stub::PrepareAsyncreadRaw(::grpc::ClientContext* context, const ::chirp::ReadRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::chirp::ReadReply>::Create(channel_.get(), cq, rpcmethod_read_, context, request, false);
+}
+
+::grpc::ClientReader< ::chirp::MonitorReply>* KeyValueStore::Stub::monitorRaw(::grpc::ClientContext* context, const ::chirp::MonitorRequest& request) {
+  return ::grpc::internal::ClientReaderFactory< ::chirp::MonitorReply>::Create(channel_.get(), rpcmethod_monitor_, context, request);
+}
+
+::grpc::ClientAsyncReader< ::chirp::MonitorReply>* KeyValueStore::Stub::AsyncmonitorRaw(::grpc::ClientContext* context, const ::chirp::MonitorRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc::internal::ClientAsyncReaderFactory< ::chirp::MonitorReply>::Create(channel_.get(), cq, rpcmethod_monitor_, context, request, true, tag);
+}
+
+::grpc::ClientAsyncReader< ::chirp::MonitorReply>* KeyValueStore::Stub::PrepareAsyncmonitorRaw(::grpc::ClientContext* context, const ::chirp::MonitorRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncReaderFactory< ::chirp::MonitorReply>::Create(channel_.get(), cq, rpcmethod_monitor_, context, request, false, nullptr);
 }
 
 KeyValueStore::Service::Service() {
@@ -95,7 +181,32 @@ KeyValueStore::Service::Service() {
       KeyValueStore_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< KeyValueStore::Service, ::chirp::DeleteRequest, ::chirp::DeleteReply>(
-          std::mem_fn(&KeyValueStore::Service::Delete), this)));
+          std::mem_fn(&KeyValueStore::Service::deletekey), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      KeyValueStore_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< KeyValueStore::Service, ::chirp::RegisterRequest, ::chirp::RegisterReply>(
+          std::mem_fn(&KeyValueStore::Service::registeruser), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      KeyValueStore_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< KeyValueStore::Service, ::chirp::ChirpRequest, ::chirp::ChirpReply>(
+          std::mem_fn(&KeyValueStore::Service::chirp), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      KeyValueStore_method_names[5],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< KeyValueStore::Service, ::chirp::FollowRequest, ::chirp::FollowReply>(
+          std::mem_fn(&KeyValueStore::Service::follow), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      KeyValueStore_method_names[6],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< KeyValueStore::Service, ::chirp::ReadRequest, ::chirp::ReadReply>(
+          std::mem_fn(&KeyValueStore::Service::read), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      KeyValueStore_method_names[7],
+      ::grpc::internal::RpcMethod::SERVER_STREAMING,
+      new ::grpc::internal::ServerStreamingHandler< KeyValueStore::Service, ::chirp::MonitorRequest, ::chirp::MonitorReply>(
+          std::mem_fn(&KeyValueStore::Service::monitor), this)));
 }
 
 KeyValueStore::Service::~Service() {
@@ -114,10 +225,45 @@ KeyValueStore::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status KeyValueStore::Service::Delete(::grpc::ServerContext* context, const ::chirp::DeleteRequest* request, ::chirp::DeleteReply* response) {
+::grpc::Status KeyValueStore::Service::deletekey(::grpc::ServerContext* context, const ::chirp::DeleteRequest* request, ::chirp::DeleteReply* response) {
   (void) context;
   (void) request;
   (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status KeyValueStore::Service::registeruser(::grpc::ServerContext* context, const ::chirp::RegisterRequest* request, ::chirp::RegisterReply* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status KeyValueStore::Service::chirp(::grpc::ServerContext* context, const ::chirp::ChirpRequest* request, ::chirp::ChirpReply* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status KeyValueStore::Service::follow(::grpc::ServerContext* context, const ::chirp::FollowRequest* request, ::chirp::FollowReply* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status KeyValueStore::Service::read(::grpc::ServerContext* context, const ::chirp::ReadRequest* request, ::chirp::ReadReply* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status KeyValueStore::Service::monitor(::grpc::ServerContext* context, const ::chirp::MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer) {
+  (void) context;
+  (void) request;
+  (void) writer;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
