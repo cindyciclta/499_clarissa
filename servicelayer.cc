@@ -4,6 +4,7 @@
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
 #include "User.h"
+#include <gtest/gtest.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -71,8 +72,8 @@ class Chirp2Impl final : public KeyValueStore::Service {
     }
 
     Status registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response)  {
-        std::cout << "here"<<std::endl;
-         ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+        std::cout << "Success Service Layer"<<std::endl;
+        ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
         clientKey.put("keytest", request->username());
         return Status::OK;
     }
@@ -108,7 +109,17 @@ void RunServer(){
 }
 
 int main(int argc, char** argv){
+    testing::InitGoogleTest(&argc, argv); 
 	RunServer();
-
-	return 0;
+    
+	return RUN_ALL_TESTS();
 }
+TEST(ClientToServiceLayer, statusisOK)
+    {
+        testing::internal::CaptureStdout();
+    
+        // Client client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
+        // client.registeruser("cindyclarissa");
+        std::string output = testing::internal::GetCapturedStdout();
+        EXPECT_EQ("Success Service Layer\n", output);
+    }

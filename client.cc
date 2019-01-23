@@ -20,6 +20,8 @@ using chirp::ReadReply;
 using chirp::MonitorRequest;
 using chirp::MonitorReply;
 using chirp::KeyValueStore;
+#include <gtest/gtest.h>
+
 
 class Client{
 public:
@@ -56,10 +58,21 @@ private:
 	std::unique_ptr<KeyValueStore::Stub> stub_;
 
 };
-int main(int argc, char** argv){
 
+
+int main(int argc, char** argv){
+	testing::InitGoogleTest(&argc, argv); 
 	Client client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
 	client.registeruser("cindyclarissa");
 
-	return 0;
+	return 	RUN_ALL_TESTS();
 }
+TEST(ServiceLayerTest, statisOK)
+    {
+    	testing::internal::CaptureStdout();
+    
+    	Client client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
+		client.registeruser("cindyclarissa");
+		std::string output = testing::internal::GetCapturedStdout();
+        EXPECT_EQ("status is ok\n", output);
+    }

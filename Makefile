@@ -2,7 +2,7 @@ HOST_SYSTEM = $(shell uname | cut -f 1 -d_)
 SYSTEM ?= $(HOST_SYSTEM)
 CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc`
-CXXFLAGS += -std=c++11
+CXXFLAGS += -std=c++11 
 ifeq ($(SYSTEM),Darwin)
 LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
            -lgrpc++_reflection\
@@ -23,13 +23,13 @@ vpath %.proto $(PROTOS_PATH)
 all: server client servicelayer
 
 server: chirp.pb.o chirp.grpc.pb.o server.o User.o User.h
-	$(CXX) $^ $(LDFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 client: chirp.pb.o chirp.grpc.pb.o client.o User.o User.h
-	$(CXX) $^ $(LDFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o User.o User.h
-	$(CXX) $^ $(LDFLAGS) -o $@
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto
