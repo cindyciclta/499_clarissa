@@ -1,72 +1,79 @@
-/*
- *
- * Copyright 2015 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
 #include <iostream>
 #include <memory>
 #include <string>
-
 #include <grpcpp/grpcpp.h>
+#include "chirp.grpc.pb.h"
+#include "User.h"
+#include <unordered_map>
 
-#ifdef BAZEL_BUILD
-#include "examples/protos/helloworld.grpc.pb.h"
-#else
-#include "helloworld.grpc.pb.h"
-#endif
+
 
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
-using helloworld::HelloRequest;
-using helloworld::HelloReply;
-using helloworld::Greeter;
+using chirp::KeyValueStore;
+using chirp::GetRequest;
+using chirp::GetReply;
+using chirp::PutReply;
+using chirp::PutRequest;
+using chirp::GetRequest;
+using chirp::DeleteRequest;
+using chirp::DeleteReply;
+class ChirpImpl final : public KeyValueStore::Service {
 
-// Logic and data behind the server's behavior.
-class GreeterServiceImpl final : public Greeter::Service {
-  Status SayHello(ServerContext* context, const HelloRequest* request,
-                  HelloReply* reply) override {
-    std::string prefix("Hello, ");
-    reply->set_message(prefix + request->name());
-    return Status::OK;
-  }
+    //testing implementation with dummy values
+	Status put(ServerContext* context, const PutRequest* request, PutReply* response) override{
+        std::cout << request->key() << std::endl;
+        std::cout << request->value() << std::endl;
+        User user(request->key());
+
+        // dataUsers.push_back(user);
+        // std::cout << dataUsers.size() << std::endl;
+		return Status::OK;
+	}
+    Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
+    	//TO-DO
+        std::vector<GetRequest> received_notes;
+    	GetRequest request;
+    	while(stream->Read(&request)){
+    		for(const GetRequest& r : received_notes){
+    			//unsure what to do here
+    		}
+    		received_notes.push_back(request);
+    	}
+
+    	return Status::OK;
+    }
+
+
+    Status Delete(ServerContext* context, const DeleteRequest* request, DeleteReply* response){
+    	//To-Do
+        return Status::OK;
+    }
+
+    //DATA SAVED HERE
+    std::unordered_map<std::string,User> data(); 
 };
 
-void RunServer() {
-  std::string server_address("0.0.0.0:50051");
-  GreeterServiceImpl service;
+void RunServer(){
+	std::string server_address("0.0.0.0:50000");
 
-  ServerBuilder builder;
-  // Listen on the given address without any authentication mechanism.
-  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  // Register "service" as the instance through which we'll communicate with
-  // clients. In this case it corresponds to an *synchronous* service.
-  builder.RegisterService(&service);
-  // Finally assemble the server.
-  std::unique_ptr<Server> server(builder.BuildAndStart());
-  std::cout << "Server listening on " << server_address << std::endl;
+	ChirpImpl service;
+	ServerBuilder builder;
+	builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
 
-  // Wait for the server to shutdown. Note that some other thread must be
-  // responsible for shutting down the server for this call to ever return.
-  server->Wait();
+	builder.RegisterService(&service);
+
+	std::unique_ptr<Server> server(builder.BuildAndStart());
+	std::cout << "Server listening on "<< server_address << std::endl;
+
+	server->Wait();
 }
 
-int main(int argc, char** argv) {
-  RunServer();
+int main(int argc, char** argv){
+	RunServer();
 
-  return 0;
+	return 0;
 }
+

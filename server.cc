@@ -32,7 +32,8 @@ class ChirpImpl final : public KeyValueStore::Service {
 		return Status::OK;
 	}
     Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
-    	std::vector<GetRequest> received_notes;
+    	//TO-DO
+        std::vector<GetRequest> received_notes;
     	GetRequest request;
     	while(stream->Read(&request)){
     		for(const GetRequest& r : received_notes){
@@ -43,8 +44,11 @@ class ChirpImpl final : public KeyValueStore::Service {
 
     	return Status::OK;
     }
+
+    
     Status Delete(ServerContext* context, const DeleteRequest* request, DeleteReply* response){
-    	return Status::OK;
+    	//To-Do
+        return Status::OK;
     }
 
     //DATA SAVED HERE

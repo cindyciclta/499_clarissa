@@ -20,12 +20,12 @@ PROTOS_PATH = chirp.proto
 
 vpath %.proto $(PROTOS_PATH)
 
-all: server client servicelayer
+all: backend client servicelayer
 
-server: chirp.pb.o chirp.grpc.pb.o server.o User.o User.h
+backend: chirp.pb.o chirp.grpc.pb.o backend.o User.o User.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-client: chirp.pb.o chirp.grpc.pb.o client.o User.o User.h
+client: chirp.pb.o chirp.grpc.pb.o clientcommandline.o User.o User.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o User.o User.h
@@ -40,4 +40,4 @@ servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o User.o User.h
 	$(PROTOC) $(PROTOS_PATH) --cpp_out=./
 
 clean:
-	rm -f *.o *.pb.cc *.pb.h server client servicelayer
+	rm -f *.o *.pb.cc *.pb.h backend client servicelayer
