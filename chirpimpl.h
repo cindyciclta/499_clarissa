@@ -28,10 +28,14 @@ using chirp::DeleteReply;
     ChirpImpl is to handle request from Service Layer and submit a response back
 **/
 class ChirpImpl final : public KeyValueStore::Service {
-  Status put(ServerContext* context, const PutRequest* request, PutReply* response); //handles request for put from the service layer
-  Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream);// handles request for monitor from service layer
-  Status Delete(ServerContext* context, const DeleteRequest* request, DeleteReply* response); // handles delete request from the service layer
-  std::unordered_map<std::string,User> data(); //Attempt to store all data in this Map. To-Do: Will need to implement threadsafe functionalities with this
+  //handles request for put from the service layer
+  Status put(ServerContext* context, const PutRequest* request, PutReply* response); 
+  //handles request for monitor from service layer
+  Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream);
+  //handles delete request from the service layer
+  Status Delete(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
+  //Attempt to store all data in this Map. To-Do: Will need to implement threadsafe functionalities with this
+  std::unordered_map<std::string,User> data(); 
 };
 
 #endif //CHIRP_IMPL_H
