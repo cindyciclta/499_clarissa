@@ -1,23 +1,23 @@
 #include "servicelayerfunctionalities.h"
 
-void RunServer(){
-	std::string server_address("0.0.0.0:50002");
+void RunServer() {
+  std::string server_address("0.0.0.0:50002");
 
-	Chirp2Impl service;
-	ServerBuilder builder;
-	builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
+  Chirp2Impl service;
+  ServerBuilder builder;
+  builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
 
-	builder.RegisterService(&service);
+  builder.RegisterService(&service);
 
-	std::unique_ptr<Server> server(builder.BuildAndStart());
-	std::cout << "Server listening on "<< server_address << std::endl;
+  std::unique_ptr<Server> server(builder.BuildAndStart());
+  std::cout << "Server listening on "<< server_address << std::endl;
 
-	server->Wait();
+  server->Wait();
 }
 
-int main(int argc, char** argv){
-    testing::InitGoogleTest(&argc, argv); 
-	RunServer();
+int main(int argc, char** argv) {
+  testing::InitGoogleTest(&argc, argv); 
+  RunServer();
     
-	return RUN_ALL_TESTS();
+  return RUN_ALL_TESTS();
 }

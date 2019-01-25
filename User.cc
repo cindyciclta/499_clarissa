@@ -3,15 +3,15 @@
 /**
 	Implmentation of user.h
 */
-User::User(const std::string name){
-	//To-Do: set up constructor
+User::User(const std::string &name) {
+	//TODO: set up constructor
 }
-void User::Chirp(const std::string chirp){
-	//To-Do: save chirps
+void User::Chirp(const std::string &chirp) {
+	//TODO: save chirps
 }
-void User::SetID(int id){
-	//To-Do: set ID
+void User::SetID(int id) {
+	//TODO: set ID
 }
-int User::GetId() const{
-	//To-Do: Get ID
+int User::GetId() const {
+	//TODO: Get ID
 }
