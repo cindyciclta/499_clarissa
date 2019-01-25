@@ -8,17 +8,25 @@
 	User class is to store every user's information when a user registers! This will be used in the backend.cc
 */
 class User {
-  public:
-    explicit User(const std::string &name); //Constructor that takes in a username
-    void Chirp(const std::string &chirp); //Save all the chirps from this user
-    void SetID(int id); //Chirp unique ID
-    int GetId() const; //Gets Chirp unique ID
+ public:
+  //Constructor that takes in a username
+  explicit User(const std::string &name);
+  //Save all the chirps from this user 
+  void Chirp(const std::string &chirp); 
+  //Chirp unique ID
+  void SetID(int id); 
+  //Gets Chirp unique ID
+  int GetId() const; 
   
-  private:
-  	std::vector<std::string> chirps_; //To store all the chirps this user sent
-    int chirpID_; //Chirp unqiue ID
-    std::string name_; // User username
-    std::vector<std::string> followers_; //All this user's followers
+ private:
+  //To store all the chirps this user sent
+  std::vector<std::string> chirps_; 
+  //Chirp unqiue ID
+  int chirpID_; 
+  // User username
+  std::string name_; 
+  //All this user's followers
+  std::vector<std::string> followers_; 
 };
 
 #endif //USER_H_

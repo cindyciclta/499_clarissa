@@ -4,7 +4,7 @@
 /*
     RunServer() runs the backend server and recieves any requests from the Service Layer
 */
-void RunServer(){
+void RunServer() {
   std::string server_address("0.0.0.0:50000");
 
   ChirpImpl service;
@@ -19,7 +19,7 @@ void RunServer(){
   server->Wait();
 }
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
   RunServer();
 
   return 0;
