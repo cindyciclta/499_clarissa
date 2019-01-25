@@ -1,15 +1,17 @@
-#include <iostream>
-#include "User.h"
+#include "user.h"
 
-User::User(std::string name){
-
+/**
+	Implmentation of user.h
+*/
+User::User(const std::string name){
+	//To-Do: set up constructor
 }
-void User::Chirp(std::string chirp){
-
+void User::Chirp(const std::string chirp){
+	//To-Do: save chirps
 }
 void User::SetID(int id){
-
+	//To-Do: set ID
 }
-int User::GetId(){
-
+int User::GetId() const{
+	//To-Do: Get ID
 }

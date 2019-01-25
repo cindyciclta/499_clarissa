@@ -22,13 +22,13 @@ vpath %.proto $(PROTOS_PATH)
 
 all: backend client servicelayer
 
-backend: chirp.pb.o chirp.grpc.pb.o backend.o User.o User.h
+backend: chirp.pb.o chirp.grpc.pb.o backend.o chirpimpl.cc chirpimpl.h user.o user.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-client: chirp.pb.o chirp.grpc.pb.o clientcommandline.o User.o User.h
+client: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h user.o user.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o User.o User.h
+servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h user.o user.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 .PRECIOUS: %.grpc.pb.cc
