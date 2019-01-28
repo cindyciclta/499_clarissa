@@ -46,11 +46,11 @@ class ClientForKeyValueStore {
  public:
   explicit ClientForKeyValueStore(std::shared_ptr<Channel> channel) :stub_(KeyValueStore::NewStub(channel)) {}
   //put data into backend
-  void put(std::string key, std::string value); 
+  void put(const std::string &key, const std::string &value); 
   //get information from backend
-  std::string get(std::string key);
+  std::string get(const std::string &key);
   //delete infromation in backend 
-  void deletekey(std::string key); 
+  void deletekey(const std::string &key); 
   
  private:
   std::unique_ptr<KeyValueStore::Stub> stub_;

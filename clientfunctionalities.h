@@ -28,17 +28,17 @@ using chirp::KeyValueStore;
 */
 class ClientFunctionalities {
  public:
-  ClientFunctionalities(std::shared_ptr<Channel> channel) :stub_(KeyValueStore::NewStub(channel)){}
+  ClientFunctionalities(const std::shared_ptr<Channel> &channel) :stub_(KeyValueStore::NewStub(channel)){}
   //Create a new user with username
-  void registeruser(std::string username); 
+  void registeruser(const std::string &username); 
   //add a chirp to this username
-  void chirp(std::string username, std::string text, std::string parent_id); 
+  void chirp(const std::string &username, const std::string &text, const std::string &parent_id); 
   //follow a chirper with this username
-  void follow(std::string username, std::string to_follow); 
+  void follow(const std::string &username, const std::string &to_follow); 
   //read all the chirps from this user
-  void read(std::string chirp_id); 
+  void read(const std::string &chirp_id); 
   //read all the chirps that their followers chirped
-  void monitor(std::string username); 
+  void monitor(const std::string &username); 
  private:
   //unsure what this does
   std::unique_ptr<KeyValueStore::Stub> stub_; 

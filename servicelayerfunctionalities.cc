@@ -3,7 +3,7 @@
 /*
     Implementing Functionalities for ClientForKeyValueStore
 */
-void  ClientForKeyValueStore::put(std::string key, std::string value) {
+void  ClientForKeyValueStore::put(const std::string &key, const std::string &value) {
   chirp::PutRequest request;
   request.set_key(key);
   request.set_value(value);
@@ -19,10 +19,10 @@ void  ClientForKeyValueStore::put(std::string key, std::string value) {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
 }
-std::string ClientForKeyValueStore::get(std::string key) {
+std::string ClientForKeyValueStore::get(const std::string &key) {
   //TODO: Functionality from commandline client that takes a key and call 'get' function from Service Layer
 }
-void ClientForKeyValueStore::deletekey(std::string key) {
+void ClientForKeyValueStore::deletekey(const std::string &key) {
   //TODO: Functionality from commandline client that takes a key and 'deletekey' function from service
 }
 /*
