@@ -1,7 +1,13 @@
 #include "chirpimpl.h"
 
 Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutReply* response) {
- //TODO: Recieving request from service layer and saving object into backend and returning a response
+  //TODO: Recieving request from service layer and saving object into backend and returning a response
+  std::lock_guard<std::mutex> lock(mymutex_);
+  //Question: how do you determine if a request is 'registeruser' or something else?
+  if(request->key() == "registeruser") {
+    User newUser(request->value(), data_.size()+1); 
+    data_.emplace(request->value(),newUser);
+  }
   return Status::OK;
 }
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {

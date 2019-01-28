@@ -36,7 +36,7 @@ Status Chirp2Impl::deletekey(ServerContext* context, const DeleteRequest* reques
 
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
-  clientKey.put("keytest", request->username());
+  clientKey.put("registeruser", request->username());
   return Status::OK;
 }
 Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response) {
