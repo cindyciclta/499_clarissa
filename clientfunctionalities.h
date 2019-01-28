@@ -28,7 +28,8 @@ using chirp::KeyValueStore;
 */
 class ClientFunctionalities {
  public:
-  ClientFunctionalities(const std::shared_ptr<Channel> &channel) :stub_(KeyValueStore::NewStub(channel)){}
+  //Constructor take takes in a shared pointer of Channel
+  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) :stub_(KeyValueStore::NewStub(channel)){}
   //Create a new user with username
   void registeruser(const std::string &username); 
   //add a chirp to this username
@@ -42,7 +43,6 @@ class ClientFunctionalities {
  private:
   //unsure what this does
   std::unique_ptr<KeyValueStore::Stub> stub_; 
-
 };
 
 #endif //CLIENT_FUNCTIONALITIES_H_

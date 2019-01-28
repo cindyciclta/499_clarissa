@@ -10,7 +10,7 @@
 class User {
  public:
   //Constructor that takes in a username
-  explicit User(const std::string &name);
+  explicit User(const std::string &name, int chirpID);
   //Save all the chirps from this user 
   void Chirp(const std::string &chirp); 
   //Chirp unique ID

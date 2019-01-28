@@ -1,7 +1,5 @@
 #include "clientfunctionalities.h"
-/**
-    Implmentation of ClientFunctionalities.h
-*/
+
 void ClientFunctionalities::registeruser(const std::string &username) {
   chirp::RegisterRequest request;
   request.set_username(username);

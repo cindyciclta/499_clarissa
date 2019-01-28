@@ -3,15 +3,16 @@
 /**
   Implmentation of user.h
 */
-User::User(const std::string &name) {
-  //TODO: set up constructor
+User::User(const std::string &name, int chirpID) {
+  name_ = name;
+  chirpID_ = chirpID;
 }
 void User::Chirp(const std::string &chirp) {
-  //TODO: save chirps
+  chirps_.push_back(chirp);
 }
 void User::SetID(int id) {
-  //TODO: set ID
+  chirpID_ = id;
 }
 int User::GetId() const {
-  //TODO: Get ID
+  return chirpID_;
 }

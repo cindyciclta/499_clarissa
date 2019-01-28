@@ -1,12 +1,7 @@
 #include "chirpimpl.h"
 
-/**
-    Implmentation of chirpimpl.h
-*/
 Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutReply* response) {
-  std::cout << request->key() << std::endl;
-  std::cout << request->value() << std::endl;
-  User user(request->key());
+ //TODO: Recieving request from service layer and saving object into backend and returning a response
   return Status::OK;
 }
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {

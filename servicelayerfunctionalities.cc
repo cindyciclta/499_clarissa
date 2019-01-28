@@ -3,7 +3,7 @@
 /*
     Implementing Functionalities for ClientForKeyValueStore
 */
-void  ClientForKeyValueStore::put(const std::string &key, const std::string &value) {
+void ClientForKeyValueStore::put(const std::string &key, const std::string &value) {
   chirp::PutRequest request;
   request.set_key(key);
   request.set_value(value);
