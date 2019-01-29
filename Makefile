@@ -33,7 +33,7 @@ servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalit
 
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto
-	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` chirp.proto   
+	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` chirp.proto userinfo.proto
 
 .PRECIOUS: %.pb.cc
 %.pb.cc: %.proto

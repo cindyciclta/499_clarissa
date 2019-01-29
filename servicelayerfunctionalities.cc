@@ -36,7 +36,19 @@ Status Chirp2Impl::deletekey(ServerContext* context, const DeleteRequest* reques
 
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
-  clientKey.put("registeruser", request->username());
+  std::string key; 
+  {
+    //Created a new message User and set it as a key because I will be saving a user's raw data in a Map < usernames, User object>
+    request->SerializeToString(&value);
+  }
+  std::string value; 
+  {
+    chirp::UsernameKey makeuser;
+    makeuser.set_username(request->username());
+    makeuser.SerializeToString(&key);
+  }
+ 
+  clientKey.put(key, value);
   return Status::OK;
 }
 Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response) {

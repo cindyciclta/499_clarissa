@@ -37,9 +37,9 @@ class ChirpImpl final : public KeyValueStore::Service {
   //handles delete request from the service layer
   Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
  private:
-  //Attempt to store all data in this Map. Key is the username, User is an object that stores user's info.
+  //Attempt to store all data in this Map. Key is the username, values is an object that stores user's info.
   //TODO: Will need to implement threadsafe functionalities with this
-  std::unordered_map<std::string,User> data_; 
+  std::unordered_map<std::string,std::string> data_; 
   //mutex to safely lock threads from accessing data_ at the same time
   std::mutex mymutex_;
 };

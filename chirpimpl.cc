@@ -3,6 +3,9 @@
 Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutReply* response) {
   //TODO: Recieving request from service layer and saving object into backend and returning a response
   std::lock_guard<std::mutex> lock(mymutex_);
+  chirp::UsernameKey newuser;
+  newuser.ParseFromString(request->key());
+  //TODO: validate whether or not username exists first s
   return Status::OK;
 }
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
@@ -17,7 +20,6 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
   }
   return Status::OK;
 }
-
 
 Status ChirpImpl::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
   //TODO: Deletes info from backend storage
