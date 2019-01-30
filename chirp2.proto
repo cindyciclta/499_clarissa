@@ -64,18 +64,19 @@ message Username {
 }
 
 message Followers {
-  repeated Username folowers = 1;  
+  repeated string followers = 1;  
 }
 
 message User {
-  Username username = 1;
-  Followers follwers = 2;
+  string username = 1;
+  Followers followers = 2;
   repeated Chirp chirps = 3;
 }
 
 message ID {
   bytes id = 1;
 }
+
 service ServiceLayer {
   rpc registeruser (RegisterRequest) returns (RegisterReply) {}
   rpc chirp (ChirpRequest) returns (ChirpReply) {}
