@@ -7,7 +7,7 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
   chirp::PutRequest request;
   request.set_key(key);
   request.set_value(value);
-
+  std::cout << "TEST1"<<std::endl;
   chirp::PutReply reply;
 
   ClientContext context;
@@ -29,30 +29,41 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
     Implementing Functionalities for Chirp2Impl
 */
 
-Status Chirp2Impl::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
-  //TODO: Takes request from service layer, deletes data from backend storage and then sends a response
-  return Status::OK;
-}
-
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
   std::string key; 
   {
-    //Created a new message User and set it as a key because I will be saving a user's raw data in a Map < usernames, User object>
-    request->SerializeToString(&value);
+    chirp::Username user;
+    user.set_username(request->username());
+    user.SerializeToString(&key);
   }
   std::string value; 
   {
-    chirp::UsernameKey makeuser;
-    makeuser.set_username(request->username());
-    makeuser.SerializeToString(&key);
+    request->SerializeToString(&value);
   }
  
   clientKey.put(key, value);
   return Status::OK;
 }
 Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response) {
-  //TODO: Takes a request from service layer, saves the chirp into backend storage and returns a repsonse 
+  ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::string key; 
+  {
+    chirp::ID id;
+    id.set_id(request->parent_id());
+    id.SerializeToString(&key);
+  }
+  std::string value; 
+  {
+    chirp::Chirp mess;
+    mess.set_username(request->username());
+    mess.set_text(request->text());
+    mess.set_id(std::to_string(chirps_ ) );
+    mess.set_parent_id(request->parent_id());
+    request->SerializeToString(&value);
+  }
+  
+  clientKey.put(key,value);
   return Status::OK;
 }
 Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, FollowReply* response) {

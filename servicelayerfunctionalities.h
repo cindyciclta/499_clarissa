@@ -6,6 +6,7 @@
 
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
+#include "chirp2.grpc.pb.h"
 #include <gtest/gtest.h>
 
 #include "User.h"
@@ -17,8 +18,8 @@ using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
 using grpc::Status;
+
 using chirp::Chirp;
-using chirp::KeyValueStore;
 using chirp::GetRequest;
 using chirp::GetReply;
 using chirp::PutReply;
@@ -26,6 +27,8 @@ using chirp::PutRequest;
 using chirp::GetRequest;
 using chirp::DeleteRequest;
 using chirp::DeleteReply;
+using chirp::KeyValueStore;
+
 using chirp::RegisterRequest;
 using chirp::RegisterReply;
 using chirp::ChirpRequest;
@@ -36,7 +39,7 @@ using chirp::ReadRequest;
 using chirp::ReadReply;
 using chirp::MonitorRequest;
 using chirp::MonitorReply;
-using chirp::KeyValueStore;
+using chirp::ServiceLayer;
 
 /*
     ClientForKeyValueStore class is for the functionalities that the service layer will call when 
@@ -60,9 +63,8 @@ class ClientForKeyValueStore {
     Chirp2Impl class is for the functionalties that would be called from the ClientCommandLine client. 
     It will handle requests from the clientcommandline client and sends a response
 */
-class Chirp2Impl final : public KeyValueStore::Service {
- //calls DeleteRequest from the backend.cc and deletes the info
-  Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
+class Chirp2Impl final : public ServiceLayer ::Service {
+ public:
   //Deletes users in backend
   Status registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response);
   //add chirps into backend storage
@@ -73,6 +75,8 @@ class Chirp2Impl final : public KeyValueStore::Service {
   Status read(ServerContext* context, const ReadRequest* request, ReadReply* response); 
   //continuously streaming chirps from all followers all saved in the backend
   Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer); 
+ private:
+  int chirps_ = 0; //Total umber of chirps 
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

@@ -9,7 +9,7 @@ void ClientFunctionalities::registeruser(const std::string &username) {
   Status status = stub_->registeruser(&context, request, &reply);
 
   if (status.ok()) {
-    std::cout << "status is ok" << std::endl;
+    std::cout << "status is ok: ClientFunctionalities" << std::endl;
   } else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
