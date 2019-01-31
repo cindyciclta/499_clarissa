@@ -84,6 +84,10 @@ message MonitorReply {
   Chirp chirp = 1;
 }
 
+message UsernameKey {
+  string username = 1;
+}
+
 service KeyValueStore {
   rpc put (PutRequest) returns (PutReply) {}
   rpc get (stream GetRequest) returns (stream GetReply) {}

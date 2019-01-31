@@ -7,6 +7,9 @@ User::User(const std::string &name, int chirpID) {
   name_ = name;
   chirpID_ = chirpID;
 }
+User::User(const std::string &name) {
+  name_ = name;
+}
 void User::Chirp(const std::string &chirp) {
   chirps_.push_back(chirp);
 }
