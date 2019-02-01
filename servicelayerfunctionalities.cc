@@ -7,7 +7,7 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
   chirp::PutRequest request;
   request.set_key(key);
   request.set_value(value);
-  std::cout << "TEST1"<<std::endl;
+
   chirp::PutReply reply;
 
   ClientContext context;
@@ -31,6 +31,7 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
 
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::cout << "here "<< std::endl;
   std::string key; 
   {
     chirp::Username user;
@@ -44,7 +45,13 @@ Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* r
     user.set_username(request->username());
     user.SerializeToString(&value);
   }
- 
+  
+  // std::string test;
+  // {
+  //   chirp::User user;
+  //   user.ParseFromString(value);
+  //   std::cout << user.username() <<std::endl;
+  // }
   clientKey.put(key, value);
   return Status::OK;
 }
@@ -74,35 +81,35 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
 Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, FollowReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
   //get information on username from backend
-  std::string bytesUserInfo = clientKey.get(request->username());
+  // std::string bytesUserInfo = clientKey.get(request->username());
   //Parse from string
-  chirp::User userInfo;
-  userInfo.ParseFromString(bytesUserInfo);
-
+  // chirp::User userInfo;
+  // userInfo.ParseFromString(bytesUserInfo);
+  std::cout << "GOT HERE: "<< request->username() << std::endl;
   std::string key; 
   {
     chirp::Username user;
     user.set_username(request->username());
     user.SerializeToString(&key);
   }
-
+  std::string test;
+  {
+    chirp::Username user;
+    user.ParseFromString(key);
+    std::cout << user.username() <<std::endl;
+  }
   std::string value; 
   {
-    std::string bytesUserToFollow = clientKey.get(request->to_follow());
+    // std::string bytesUserToFollow = clientKey.get(request->to_follow());
     //TODO: check if user to_follow exists
+    chirp::User user;
+    //Get all user's followers into temp var userFollowers
+    // chirp::Followers userFollowers;
+    // std::string *addingF = userFollowers.add_followers();;
+    // *addingF = request->to_follow(); //add new follower to the list of followers
+    // user.set_allocated_followers(&userFollowers);
 
-    //create new user to replace the old user info
-    chirp::User recreateUser;
-    recreateUser.set_username(request->username());
-
-    if(!userInfo.has_followers()) {
-      chirp::Followers userFollowers;
-      userFollowers.add_followers(request->to_follow());
-      recreateUser.set_followers(userFollowers);
-      //HOW TO SET MESSAGE TO A MESSAGE?!
-    }
-    //TODO: Else if it has existing followers
-    recreateUser.SerializeToString(&value);
+    user.SerializeToString(&value);
   }
 
   clientKey.put(key,value);

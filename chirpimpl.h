@@ -11,8 +11,6 @@
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
 
-#include "user.h"
-
 using std::vector;
 using grpc::Server;
 using grpc::ServerBuilder;

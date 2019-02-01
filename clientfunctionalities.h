@@ -5,7 +5,6 @@
 #include <string>
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
-#include "chirp2.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -22,6 +21,7 @@ using chirp::ReadReply;
 using chirp::MonitorRequest;
 using chirp::MonitorReply;
 using chirp::ServiceLayer;
+using chirp::KeyValueStore;
 /**
 	ClientFunctionalities is a class that the Command Line Client will call when 
 	users are registering, sending a chirp, following other chirpers, and etc.

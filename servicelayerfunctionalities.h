@@ -6,7 +6,6 @@
 
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
-#include "chirp2.grpc.pb.h"
 #include <gtest/gtest.h>
 
 #include "User.h"

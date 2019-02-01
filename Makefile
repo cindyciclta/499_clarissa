@@ -25,15 +25,15 @@ all: backend clientcommandline servicelayer
 backend: chirp.pb.o chirp.grpc.pb.o backend.o chirpimpl.cc chirpimpl.h user.o user.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-clientcommandline: chirp2.pb.o chirp2.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h user.o user.h
+clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h user.o user.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-servicelayer: chirp.pb.o chirp.grpc.pb.o chirp2.pb.o chirp2.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h user.o user.h
+servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h user.o user.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto
-	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` chirp.proto chirp2.proto 
+	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` chirp.proto
 
 .PRECIOUS: %.pb.cc
 %.pb.cc: %.proto

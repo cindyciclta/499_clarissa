@@ -11,6 +11,9 @@
 int main(int argc, char** argv) {
   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
   client.registeruser("cindyclarissa");
+  client.registeruser("cindyclarissa2");
+  client.registeruser("cindyclarissa3");
+  client.follow("cindyclarissa", "cindyclarissa2");
   return  0;
 }
 
