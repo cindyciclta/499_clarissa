@@ -29,34 +29,72 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
     Implementing Functionalities for Chirp2Impl
 */
 
-Status Chirp2Impl::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
-  //TODO: Takes request from service layer, deletes data from backend storage and then sends a response
-  return Status::OK;
-}
-
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::cout << "here "<< std::endl;
   std::string key; 
   {
-    //Created a new message User and set it as a key because I will be saving a user's raw data in a Map < usernames, User object>
-    request->SerializeToString(&value);
+    chirp::Username user;
+    user.set_username(request->username());
+    user.SerializeToString(&key);
   }
+
   std::string value; 
   {
-    chirp::UsernameKey makeuser;
-    makeuser.set_username(request->username());
-    makeuser.SerializeToString(&key);
+    chirp::User user;
+    user.set_username(request->username());
+    user.SerializeToString(&value);
   }
- 
   clientKey.put(key, value);
   return Status::OK;
 }
 Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response) {
-  //TODO: Takes a request from service layer, saves the chirp into backend storage and returns a repsonse 
+  ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::string key; 
+  {
+    chirp::ID id;
+    //TODO: I believe that I need to figure out if this Chirp is a new Chirp or a reply Chirp
+    id.set_id(request->parent_id());
+    id.SerializeToString(&key);
+  }
+
+  std::string value; 
+  {
+    chirp::Chirp mess;
+    mess.set_username(request->username());
+    mess.set_text(request->text());
+    mess.set_id(std::to_string(chirps_ ) );
+    mess.set_parent_id(request->parent_id());
+    mess.SerializeToString(&value);
+  }
+
+  clientKey.put(key,value);
   return Status::OK;
 }
 Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, FollowReply* response) {
-  //TODO: Takes a request from service layer, adds a follower to the user in backend storage and returns a repsonse 
+  ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+
+  std::string key; 
+  {
+    chirp::Username user;
+    user.set_username(request->username());
+    user.SerializeToString(&key);
+  }
+  std::string test;
+  {
+    chirp::Username user;
+    user.ParseFromString(key);
+    std::cout << user.username() <<std::endl;
+  }
+  std::string value; 
+  {
+    //TODO: Send User message back with added follower
+    chirp::User user;
+
+    user.SerializeToString(&value);
+  }
+
+  clientKey.put(key,value);
   return Status::OK;
 }
 Status Chirp2Impl::read(ServerContext* context, const ReadRequest* request, ReadReply* response) {

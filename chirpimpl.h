@@ -6,12 +6,12 @@
 #include <string>
 #include <unordered_map>
 #include <mutex>
+#include <vector>
 
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
 
-#include "user.h"
-
+using std::vector;
 using grpc::Server;
 using grpc::ServerBuilder;
 using grpc::ServerContext;
@@ -37,9 +37,9 @@ class ChirpImpl final : public KeyValueStore::Service {
   //handles delete request from the service layer
   Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
  private:
-  //Attempt to store all data in this Map. Key is the username, values is an object that stores user's info.
+  //Attempt to store all data in this Map. Key is serialized username or ID, values (serialized) stores user's info, or chirps, respectively.
   //TODO: Will need to implement threadsafe functionalities with this
-  std::unordered_map<std::string,std::string> data_; 
+  std::unordered_map<std::string, std::string > data_; 
   //mutex to safely lock threads from accessing data_ at the same time
   std::mutex mymutex_;
 };

@@ -9,8 +9,7 @@
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
-using chirp::Timestamp;
-using chirp::Chirp;
+
 using chirp::RegisterRequest;
 using chirp::RegisterReply;
 using chirp::ChirpRequest;
@@ -21,6 +20,7 @@ using chirp::ReadRequest;
 using chirp::ReadReply;
 using chirp::MonitorRequest;
 using chirp::MonitorReply;
+using chirp::ServiceLayer;
 using chirp::KeyValueStore;
 /**
 	ClientFunctionalities is a class that the Command Line Client will call when 
@@ -29,7 +29,7 @@ using chirp::KeyValueStore;
 class ClientFunctionalities {
  public:
   //Constructor take takes in a shared pointer of Channel
-  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) :stub_(KeyValueStore::NewStub(channel)) {}
+  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) :stub_(chirp::ServiceLayer::NewStub(channel)) {}
   //Create a new user with username
   void registeruser(const std::string &username); 
   //add a chirp to this username
@@ -42,7 +42,7 @@ class ClientFunctionalities {
   void monitor(const std::string &username); 
  private:
   //unsure what this does
-  std::unique_ptr<KeyValueStore::Stub> stub_; 
+  std::unique_ptr<chirp::ServiceLayer::Stub> stub_; 
 };
 
 #endif //CLIENT_FUNCTIONALITIES_H_

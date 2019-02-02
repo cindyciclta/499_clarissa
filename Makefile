@@ -16,7 +16,7 @@ PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
 GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)` 
 
-PROTOS_PATH = chirp.proto
+PROTOS_PATH = *.proto
 
 vpath %.proto $(PROTOS_PATH)
 
@@ -33,7 +33,7 @@ servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalit
 
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto
-	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` chirp.proto userinfo.proto
+	protoc --grpc_out=. --plugin=protoc-gen-grpc=`which grpc_cpp_plugin` chirp.proto
 
 .PRECIOUS: %.pb.cc
 %.pb.cc: %.proto

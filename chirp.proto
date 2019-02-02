@@ -35,7 +35,7 @@ message Timestamp {
 
 message Chirp {
   string username = 1;  // The user who posted this chirp.
-  string text = 2;  // The contents of the chirp.
+  string text =  2;  // The contents of the chirp.
   bytes id = 3;  // The ID of this chirp.
   bytes parent_id = 4;  // The ID, if any, of the chirp this is in reply to.
   Timestamp timestamp = 5;  // The time this chirp was posted.
@@ -84,18 +84,37 @@ message MonitorReply {
   Chirp chirp = 1;
 }
 
-message UsernameKey {
+message Username {
   string username = 1;
 }
+
+message Followers {
+  repeated string followers = 1;  
+}
+
+message User {
+  string username = 1;
+  Followers followers = 2;
+  repeated Chirp chirps = 3;
+}
+
+message ID {
+  bytes id = 1;
+} 
 
 service KeyValueStore {
   rpc put (PutRequest) returns (PutReply) {}
   rpc get (stream GetRequest) returns (stream GetReply) {}
   rpc deletekey (DeleteRequest) returns (DeleteReply) {}
+}
+
+service ServiceLayer {
   rpc registeruser (RegisterRequest) returns (RegisterReply) {}
   rpc chirp (ChirpRequest) returns (ChirpReply) {}
   rpc follow (FollowRequest) returns (FollowReply) {}
   rpc read (ReadRequest) returns (ReadReply) {}
   rpc monitor (MonitorRequest) returns (stream MonitorReply) {}
-
 }
+
+
+
