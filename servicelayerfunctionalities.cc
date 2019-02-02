@@ -45,13 +45,6 @@ Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* r
     user.set_username(request->username());
     user.SerializeToString(&value);
   }
-  
-  // std::string test;
-  // {
-  //   chirp::User user;
-  //   user.ParseFromString(value);
-  //   std::cout << user.username() <<std::endl;
-  // }
   clientKey.put(key, value);
   return Status::OK;
 }
@@ -80,12 +73,7 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
 }
 Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, FollowReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
-  //get information on username from backend
-  // std::string bytesUserInfo = clientKey.get(request->username());
-  //Parse from string
-  // chirp::User userInfo;
-  // userInfo.ParseFromString(bytesUserInfo);
-  std::cout << "GOT HERE: "<< request->username() << std::endl;
+
   std::string key; 
   {
     chirp::Username user;
@@ -100,14 +88,8 @@ Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, 
   }
   std::string value; 
   {
-    // std::string bytesUserToFollow = clientKey.get(request->to_follow());
-    //TODO: check if user to_follow exists
+    //TODO: Send User message back with added follower
     chirp::User user;
-    //Get all user's followers into temp var userFollowers
-    // chirp::Followers userFollowers;
-    // std::string *addingF = userFollowers.add_followers();;
-    // *addingF = request->to_follow(); //add new follower to the list of followers
-    // user.set_allocated_followers(&userFollowers);
 
     user.SerializeToString(&value);
   }

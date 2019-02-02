@@ -4,15 +4,6 @@ Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutRepl
   //TODO: Recieving request from service layer and saving object into backend and returning a response
   std::lock_guard<std::mutex> lock(mymutex_);
   data_.emplace(request->key(), request->value());
-  std::cout << "Size data_ "<< data_.size() <<std::endl;
-  {
-    std::cout << "TESTING " << request->value() << std::endl;
-    std::cout << std::endl;
-    // std::string temp = request->value();
-    // chirp::User user;
-    // user.ParseFromString(temp);
-    // std::cout << user.username() <<std::endl;
-  }
   return Status::OK;
 }
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
