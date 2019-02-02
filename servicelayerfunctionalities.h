@@ -5,10 +5,8 @@
 #include <string>
 
 #include <grpcpp/grpcpp.h>
+#include <grpcpp/client_context.h>
 #include "chirp.grpc.pb.h"
-#include <gtest/gtest.h>
-
-#include "User.h"
 
 using grpc::Channel;
 using grpc::ClientContext;

@@ -21,6 +21,27 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
 }
 std::string ClientForKeyValueStore::get(const std::string &key) {
   //TODO: Functionality from commandline client that takes a key and call 'get' function from Service Layer
+  chirp::GetRequest request;
+  request.set_key(key);
+
+  ClientContext context;
+  std::shared_ptr<grpc::ClientReaderWriter <GetRequest, GetReply> > stream(stub_->get(&context));
+
+  stream->Write(request);
+  stream->WritesDone();
+
+  chirp::GetReply reply;
+  while (stream->Read(&reply)) {
+    std::cout << "GOT SOMETHING "<< std::endl;
+  }
+
+  Status status = stream->Finish();
+  if (!status.ok()) {
+    std::cout << "status is ok from get" << std::endl;
+  }
+  else {
+    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+  }
 }
 void ClientForKeyValueStore::deletekey(const std::string &key) {
   //TODO: Functionality from commandline client that takes a key and 'deletekey' function from service
@@ -31,7 +52,6 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
 
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
-  std::cout << "here "<< std::endl;
   std::string key; 
   {
     chirp::Username user;
@@ -64,8 +84,16 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
     mess.set_username(request->username());
     mess.set_text(request->text());
     mess.set_id(std::to_string(chirps_ ) );
+    chirps_++;
     mess.set_parent_id(request->parent_id());
     mess.SerializeToString(&value);
+  }
+  //Serializing: tested in this location
+  std::string test;
+  {
+    chirp::Chirp c;
+    c.ParseFromString(value);
+    std::cout << c.text() <<std::endl;
   }
 
   clientKey.put(key,value);
@@ -82,6 +110,8 @@ Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, 
   }
   std::string test;
   {
+    std::string getKey = clientKey.get(request->username());
+
     chirp::Username user;
     user.ParseFromString(key);
     std::cout << user.username() <<std::endl;
@@ -89,8 +119,8 @@ Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, 
   std::string value; 
   {
     //TODO: Send User message back with added follower
-    chirp::User user;
 
+    chirp::User user;
     user.SerializeToString(&value);
   }
 

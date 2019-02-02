@@ -8,9 +8,11 @@ Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutRepl
 }
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
   //TODO: Streaming chirps to user
+
   std::vector<GetRequest> received_requests;
   GetRequest request;
   while (stream->Read(&request)) {
+    received_requests.push_back(request);
     for (const GetRequest& r : received_requests) {
       //TODO: Continuously sends data through stream
       for(const auto &i: data_) {
@@ -22,7 +24,6 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
         }
       }
     }
-    received_requests.push_back(request);
   }
   return Status::OK;
 }
