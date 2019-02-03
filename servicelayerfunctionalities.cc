@@ -4,12 +4,12 @@
     Implementing Functionalities for ClientForKeyValueStore
 */
 void ClientForKeyValueStore::put(const std::string &key, const std::string &value) {
+  std::cout << std::endl;
   chirp::PutRequest request;
   request.set_key(key);
   request.set_value(value);
-
+  
   chirp::PutReply reply;
-
   ClientContext context;
   Status status = stub_->put(&context, request, &reply);
 
@@ -21,6 +21,8 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
 }
 std::string ClientForKeyValueStore::get(const std::string &key) {
   //TODO: Functionality from commandline client that takes a key and call 'get' function from Service Layer
+  std::cout << std::endl;
+
   chirp::GetRequest request;
   request.set_key(key);
 
@@ -31,17 +33,17 @@ std::string ClientForKeyValueStore::get(const std::string &key) {
   stream->WritesDone();
 
   chirp::GetReply reply;
-  while (stream->Read(&reply)) {
-    std::cout << "GOT SOMETHING "<< std::endl;
-  }
+  stream->Read(&reply);
 
   Status status = stream->Finish();
+
   if (!status.ok()) {
     std::cout << "status is ok from get" << std::endl;
   }
   else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
+  return reply.value();
 }
 void ClientForKeyValueStore::deletekey(const std::string &key) {
   //TODO: Functionality from commandline client that takes a key and 'deletekey' function from service
@@ -58,14 +60,13 @@ Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* r
     user.set_username(request->username());
     user.SerializeToString(&key);
   }
-
   std::string value; 
   {
-    chirp::User user;
-    user.set_username(request->username());
-    user.SerializeToString(&value);
+    chirp::User user2;
+    user2.set_username(request->username());
+    user2.SerializeToString(&value);
+    clientKey.put(key, value);
   }
-  clientKey.put(key, value);
   return Status::OK;
 }
 Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response) {
@@ -111,20 +112,18 @@ Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, 
   std::string test;
   {
     std::string getKey = clientKey.get(request->username());
-
-    chirp::Username user;
-    user.ParseFromString(key);
-    std::cout << user.username() <<std::endl;
+    chirp::User user;
+    user.ParseFromString(getKey);
+    
   }
   std::string value; 
   {
-    //TODO: Send User message back with added follower
-
+  //   //TODO: Send User message back with added follower
     chirp::User user;
     user.SerializeToString(&value);
   }
 
-  clientKey.put(key,value);
+  // clientKeys.put(key,value);
   return Status::OK;
 }
 Status Chirp2Impl::read(ServerContext* context, const ReadRequest* request, ReadReply* response) {

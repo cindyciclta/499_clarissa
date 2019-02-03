@@ -5,6 +5,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <mutex>
 #include <vector>
 
@@ -24,7 +25,6 @@ using chirp::PutRequest;
 using chirp::GetRequest;
 using chirp::DeleteRequest;
 using chirp::DeleteReply;
-
 /**
     ChirpImpl is to handle request from Service Layer and submit a response back
 **/
@@ -39,7 +39,8 @@ class ChirpImpl final : public KeyValueStore::Service {
  private:
   //Attempt to store all data in this Map. Key is serialized username or ID, values (serialized) stores user's info, or chirps, respectively.
   //TODO: Will need to implement threadsafe functionalities with this
-  std::unordered_map<std::string, std::string > data_; 
+  std::unordered_map<std::string, std::string >  data_;
+  // std::vector <std::vector <std::string> > data_;
   //mutex to safely lock threads from accessing data_ at the same time
   std::mutex mymutex_;
 };

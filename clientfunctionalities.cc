@@ -35,7 +35,7 @@ void ClientFunctionalities::chirp(const std::string &username, const std::string
 void ClientFunctionalities::follow(const std::string &username, const std::string &to_follow) {
   chirp::FollowRequest request;
   request.set_username(username);
-  request.set_username(to_follow);
+  request.set_to_follow(to_follow);
   chirp::FollowReply reply;
         
   ClientContext context;

@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
   client.registeruser("cindyclarissa");
   client.registeruser("cindyclarissa2");
   client.registeruser("cindyclarissa3");
-  client.chirp("cindyclarissa", "Testing 123","1");
+  // client.chirp("cindyclarissa", "Testing 123","1");
   client.follow("cindyclarissa", "cindyclarissa2");
   return  0;
 }
