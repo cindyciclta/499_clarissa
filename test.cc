@@ -26,64 +26,86 @@ using chirp::MonitorReply;
 using chirp::ServiceLayer;
 using chirp::KeyValueStore;
 
-//threadtest1 and 2 is to test multithreading. 
-// void threadtest1(){
-//   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-//   std::string username = "user";
-//   int i = 0;
-//   while(true) {
-//     std::string combine = username +  std::to_string(++i);
-//     client.registeruser(combine);
-//     usleep(50000);
-//   }
-// }
 
-// void threadtest2(){
-//   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-//   std::string username = "seconduser";
-//   int i = 0;
-//   while(true) {
-//     std::string combine = username +  std::to_string(++i);
-//     client.registeruser(combine);
-//     usleep(50000);
-//   }
-// }
-
-/*
-  This ServiceLayerTest will test if the commandline client can successfully request to register a user to the service layer
-*/
-// TEST(ServiceLayerTest, statisOK)
-// {
-//   testing::internal::CaptureStdout();
-    
-//   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-//   client.registeruser("cindyclarissa");
-//   std::string output = testing::internal::GetCapturedStdout();
-//   EXPECT_EQ("status is ok: ClientFunctionalities\n", output);
-// }
-
-// TEST(ServiceLayerTestFollowers, statisOK)
-// {
-//   testing::internal::CaptureStdout();
-    
-//   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-//   client.registeruser("cindyclarissa");
-//   client.registeruser("cindyclarissa2");
-//   std::string output = testing::internal::GetCapturedStdout();
-//   EXPECT_EQ("status is ok: ClientFunctionalities\n", output);
-
-//   client.follow("cindyclarissa", "cindyclarissa2");
-
-// }
 std::unordered_map<std::string, std::string >  data_;
 class BackendClientTest {
  public:
   void put(std::string key, std::string value) {
-    data_.emplace(key, value);
+    addkey(key, value);
+  }
+  std::string get(std::string key) {
+    auto it = data_.find(key);
+      if(it != data_.end()) {
+        return it->second;
+      } 
+  }
+ private:
+  void addkey(const std::string &key, const std::string &value) {
+    auto it = data_.find(key);
+    if(it != data_.end()) {
+      it->second = value;
+    } else {
+      data_.emplace(key, value);
+    }
   }
 };
 
-TEST(chirpImplBackend, statisOK)
+TEST(ServiceLayerTestFollowers, statisOK)
+{
+  testing::internal::CaptureStdout();
+  
+  BackendClientTest client;
+
+  // ClientForKeyValueStore client(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::string valueforregisteruser1; 
+  {
+    chirp::User userValue;
+    userValue.set_username("user1"); 
+    userValue.SerializeToString(&valueforregisteruser1);
+  }
+
+  std::string valueforregisteruser2; 
+  {
+    chirp::User userValue;
+    userValue.set_username("user2"); 
+    userValue.SerializeToString(&valueforregisteruser2);
+  }
+
+  client.put("user1", valueforregisteruser1);
+  auto it = data_.find("user1");
+  EXPECT_EQ("user2",it->first);
+
+  client.put("user2", valueforregisteruser2);
+  it = data_.find("user2");
+  EXPECT_EQ("user2",it->first);
+  
+  //Add a followe to user1 for testing
+  std::string valueforfollow;
+  {
+    chirp::User user;
+    std::string getKey = client.get("user1");
+    user.ParseFromString(getKey);
+
+    chirp::Followers* f = user.mutable_followers();
+    f->add_username("user2");
+    user.SerializeToString(&valueforfollow);
+    client.put("user1", valueforfollow);
+  }
+
+  //Checks if the value for key: user1 is correct
+  std::string test; 
+  {
+    std::string getKey = client.get("user1");
+    chirp::User user;
+    user.ParseFromString(getKey);
+    EXPECT_EQ(user.username(), "user1");
+    EXPECT_EQ(user.followers().username_size(),1);
+    EXPECT_EQ(user.followers().username(0),"user2");
+  }
+
+}
+
+TEST(ServiceLayerRegisteruser, statisOK)
 {
   BackendClientTest client;
   std::string key, value;

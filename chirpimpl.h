@@ -43,6 +43,7 @@ class ChirpImpl final : public KeyValueStore::Service {
   // std::vector <std::vector <std::string> > data_;
   //mutex to safely lock threads from accessing data_ at the same time
   std::mutex mymutex_;
+  void addkey(const std::string &key, const std::string &value);
 };
 
 #endif //CHIRP_IMPL_H

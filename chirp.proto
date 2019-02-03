@@ -89,7 +89,7 @@ message Username {
 }
 
 message Followers {
-  repeated string followers = 1;  
+  repeated string username = 1;  
 }
 
 message User {
