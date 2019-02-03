@@ -62,19 +62,19 @@ using chirp::KeyValueStore;
 //   EXPECT_EQ("status is ok: ClientFunctionalities\n", output);
 // }
 
-TEST(ServiceLayerTestFollowers, statisOK)
-{
-  testing::internal::CaptureStdout();
+// TEST(ServiceLayerTestFollowers, statisOK)
+// {
+//   testing::internal::CaptureStdout();
     
-  ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-  client.registeruser("cindyclarissa");
-  client.registeruser("cindyclarissa2");
-  std::string output = testing::internal::GetCapturedStdout();
-  EXPECT_EQ("status is ok: ClientFunctionalities\n", output);
+//   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
+//   client.registeruser("cindyclarissa");
+//   client.registeruser("cindyclarissa2");
+//   std::string output = testing::internal::GetCapturedStdout();
+//   EXPECT_EQ("status is ok: ClientFunctionalities\n", output);
 
-  client.follow("cindyclarissa", "cindyclarissa2");
+//   client.follow("cindyclarissa", "cindyclarissa2");
 
-}
+// }
 std::unordered_map<std::string, std::string >  data_;
 class BackendClientTest {
  public:
@@ -83,31 +83,31 @@ class BackendClientTest {
   }
 };
 
-// TEST(chirpImplBackend, statisOK)
-// {
-//   BackendClientTest client;
-//   std::string key, value;
+TEST(chirpImplBackend, statisOK)
+{
+  BackendClientTest client;
+  std::string key, value;
 
-//   chirp::Username user;
-//   user.set_username("Cindyclarissa");
-//   user.SerializeToString(&key);
+  chirp::Username user;
+  user.set_username("Cindyclarissa");
+  user.SerializeToString(&key);
 
-//   chirp::User user2;
-//   user2.set_username("Cindyclarissa");
-//   user2.SerializeToString(&value);
+  chirp::User user2;
+  user2.set_username("Cindyclarissa");
+  user2.SerializeToString(&value);
 
-//   client.put(key, value);
-//   ASSERT_TRUE(data_.size() != 0);
-//   EXPECT_EQ(1,data_.size());
+  client.put(key, value);
+  ASSERT_TRUE(data_.size() != 0);
+  EXPECT_EQ(1,data_.size());
   
-//   std::string key2;
-//   chirp::Username user3;
-//   user3.set_username("Cindyclarissa");
-//   user3.SerializeToString(&key2);
+  std::string key2;
+  chirp::Username user3;
+  user3.set_username("Cindyclarissa");
+  user3.SerializeToString(&key2);
   
-//   auto it = data_.find(key2);
-//   EXPECT_EQ(key,it->first);
-// }
+  auto it = data_.find(key2);
+  EXPECT_EQ(key,it->first);
+}
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv); 
