@@ -11,22 +11,15 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
   //TODO: Streaming chirps to user
 
   GetRequest request;
-
   while (stream->Read(&request)) {
-      auto it = data_.find( request.key());
-      if(it != data_.end()) {
-        GetReply reply;
-        std::string test; 
-        {
-          chirp::User user;
-          user.ParseFromString(it->second);
-          std::string temp = it->second;
-        }
-        reply.set_value(it->second);
-        stream->Write(reply);
-      }else {
-        std::cout << "Not Found Key"<<std::endl;
-      }
+    auto it = data_.find(request.key());
+    if (it != data_.end()) {
+      GetReply reply;
+      reply.set_value(it->second);
+      stream->Write(reply);
+    } else {
+      std::cout << "Not Found Key"<<std::endl;
+    }
   }
   std:: cout << std::endl;
   return Status::OK;
