@@ -12,6 +12,9 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
 
   GetRequest request;
   while (stream->Read(&request)) {
+    for(const auto &i: data_) {
+      std::cout << i.first << std::endl;
+    }
     auto it = data_.find(request.key());
     if (it != data_.end()) {
       GetReply reply;
@@ -29,6 +32,7 @@ void ChirpImpl::addkey(const std::string &key, const std::string &value) {
   if(it != data_.end()) {
     it->second = value;
   } else {
+    std::cout << "inserting "<< key << std::endl;
     data_.emplace(key, value);
   }
    

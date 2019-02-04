@@ -5,6 +5,7 @@
 #include <string>
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
+#include <thread>
 
 using grpc::Channel;
 using grpc::ClientContext;

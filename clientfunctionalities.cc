@@ -48,7 +48,13 @@ void ClientFunctionalities::follow(const std::string &username, const std::strin
   }
 }
 void ClientFunctionalities::read(const std::string &chirp_id) {
-  //TODO: Reads a chirp thread
+  chirp::ReadRequest request;
+  request.set_chirp_id(chirp_id);
+  chirp::ReadReply reply;
+  ClientContext context;
+
+  std::shared_ptr<grpc::ClientReaderWriter<chirp::ReadRequest, chirp::ReadReply>> stream(stub_->read(&context, request, &reply));
+
 }
 void ClientFunctionalities::monitor(const std::string &username) {
   //TODO: Continuiously stream chirps from all followed users. Sends a request to service layer

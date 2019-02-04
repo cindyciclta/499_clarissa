@@ -89,31 +89,57 @@ Status Chirp2Impl::follow(ServerContext* context, const FollowRequest* request, 
 
 Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  /*
+    Tested: Able to add chirps! "chip<id>" is key and message Proto Chirp is value 
+  */
+
+  chirp::User user;
+  std::string getValue = clientKey.get(request->username());
+  user.ParseFromString(getValue);
+  std::string userKey;
 
   std::string value; 
   {
-    chirp::Chirp message;
-    message.set_username(request->username());
-    message.set_text(request->text());
-    message.set_id(std::to_string(chirps_ ) );
+    chirp::Chirp* message = user.add_chirps();
+    message->set_username(request->username());
+    message->set_text(request->text());
+    message->set_id(std::to_string(chirps_ ) );
     chirps_++;
-    message.set_parent_id(request->parent_id());
-    message.SerializeToString(&value);
-  }
-  //Serializing: tested in this location
-  std::string test;
-  {
-    chirp::Chirp c;
-    c.ParseFromString(value);
-    std::cout << c.text() <<std::endl;
+    //TODO: Timestamp
+    message->set_parent_id(request->parent_id());
+    message->SerializeToString(&value);
+    user.SerializeToString(&userKey);
   }
 
-  clientKey.put("chirp"+std::to_string(chirps_-1),value);
+  if (request->parent_id() == "none") {
+    clientKey.put("chirp"+std::to_string(chirps_),value);
+  } else {
+    clientKey.put("reply"+request->parent_id(),value);
+  }
+  clientKey.put(request->username(),userKey);
+  
+  std::string test;
+  {
+    chirp::User user;
+    std::string getValue = clientKey.get(request->username());
+    user.ParseFromString(getValue);
+
+    std::cout << "ULTIMATE TEST: "<< user.chirps(0).text() <<std::endl;
+  }
+
   return Status::OK;
 }
 
 Status Chirp2Impl::read(ServerContext* context, const ReadRequest* request, ReadReply* response) {
-  //TODO: Takes a request from service layer, reads chirps from user in backend storage and returns a repsonse 
+  ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::string chirpmsg = clientKey.get("chirp"+request->chirp_id());//assume chip_id is an a number
+  std::string test;
+  {
+    chirp::Chirp c;
+    c.ParseFromString(chirpmsg);
+    std::cout << c.text() <<std::endl;
+  }
+
   return Status::OK;
 }
 Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer) {
