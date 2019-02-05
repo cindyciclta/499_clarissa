@@ -19,6 +19,7 @@ void RunServer() {
 }
 
 int main(int argc, char** argv) {
+  //testing::InitGoogleTest(&argc, argv); 
   RunServer();
 
   return 0;

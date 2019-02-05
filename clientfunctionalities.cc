@@ -15,13 +15,27 @@ void ClientFunctionalities::registeruser(const std::string &username) {
   }
 }
 void ClientFunctionalities::chirp(const std::string &username, const std::string &text, const std::string &parent_id) {
-  //TODO: Sends a chirp to the service layer
+  chirp::ChirpRequest request;
+  request.set_username(username);
+  request.set_text(text);
+  request.set_parent_id(parent_id);
+  //TODO: count chirps and make it as chirp ID
+  //TODO: Timestamp
+  chirp::ChirpReply reply;
+  ClientContext context;
+  Status status = stub_->chirp(&context, request, &reply);
+
+  if (status.ok()) {
+    std::cout << "status is ok: ClientFunctionalities" << std::endl;
+  } else {
+    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+  }
   
 }
 void ClientFunctionalities::follow(const std::string &username, const std::string &to_follow) {
   chirp::FollowRequest request;
   request.set_username(username);
-  request.set_username(to_follow);
+  request.set_to_follow(to_follow);
   chirp::FollowReply reply;
         
   ClientContext context;

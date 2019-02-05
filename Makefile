@@ -20,15 +20,18 @@ PROTOS_PATH = *.proto
 
 vpath %.proto $(PROTOS_PATH)
 
-all: backend clientcommandline servicelayer
+all: test backend clientcommandline servicelayer
 
-backend: chirp.pb.o chirp.grpc.pb.o backend.o chirpimpl.cc chirpimpl.h user.o user.h
+backend: chirp.pb.o chirp.grpc.pb.o backend.o chirpimpl.cc chirpimpl.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h user.o user.h
+clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h user.o user.h
+servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
+
+test: chirp.pb.o chirp.grpc.pb.o test.o backendclientunittest.h clientfunctionalities.o clientfunctionalities.h servicelayerfunctionalities.o servicelayerfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 .PRECIOUS: %.grpc.pb.cc
@@ -40,4 +43,4 @@ servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalit
 	$(PROTOC) $(PROTOS_PATH) --cpp_out=./
 
 clean:
-	rm -f *.o *.pb.cc *.pb.h backend clientcommandline servicelayer
+	rm -f *.o *.pb.cc *.pb.h backend clientcommandline servicelayer test
