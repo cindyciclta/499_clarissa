@@ -47,14 +47,29 @@ void ClientFunctionalities::follow(const std::string &username, const std::strin
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
 }
-void ClientFunctionalities::read(const std::string &chirp_id) {
+std::multimap<std::string, std::string> ClientFunctionalities::read(const std::string &chirp_id) {
+  /* 
+    Tested: Able to recieve replied chirps from chirp_id!
+  */
   chirp::ReadRequest request;
   request.set_chirp_id(chirp_id);
   chirp::ReadReply reply;
   ClientContext context;
+  Status status = stub_->read(&context, request, &reply);
 
-  std::shared_ptr<grpc::ClientReaderWriter<chirp::ReadRequest, chirp::ReadReply>> stream(stub_->read(&context, request, &reply));
+  std::multimap <std::string,std::string> mymap;
+  for (int i = 0; i < reply.chirps_size(); i++) {
+    chirp::Chirp c = reply.chirps(i);
+    mymap.emplace(c.username(),c.text()); 
+    //TODO: Add Timestamp with this
+  }
 
+  if (status.ok()) {
+    std::cout << "status is ok: ClientFunctionalities" << std::endl;
+  } else {
+    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+  }
+  return mymap;
 }
 void ClientFunctionalities::monitor(const std::string &username) {
   //TODO: Continuiously stream chirps from all followed users. Sends a request to service layer

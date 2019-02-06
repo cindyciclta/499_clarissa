@@ -9,8 +9,9 @@ Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutRepl
 }
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
   //TODO: Streaming chirps to user
-
+  std::lock_guard<std::mutex> lock(mymutex_);
   GetRequest request;
+  bool found = false;
   while (stream->Read(&request)) {
     for(const auto &i: data_) {
       std::cout << i.first << std::endl;
@@ -19,10 +20,14 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
     if (it != data_.end()) {
       GetReply reply;
       reply.set_value(it->second);
+      found = true;
       stream->Write(reply);
     } else {
       std::cout << "Not Found Key"<<std::endl;
     }
+  }
+  if (!found) {
+    return Status::CANCELLED;
   }
   std:: cout << std::endl;
   return Status::OK;
@@ -32,7 +37,6 @@ void ChirpImpl::addkey(const std::string &key, const std::string &value) {
   if(it != data_.end()) {
     it->second = value;
   } else {
-    std::cout << "inserting "<< key << std::endl;
     data_.emplace(key, value);
   }
    
