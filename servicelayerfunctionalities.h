@@ -72,12 +72,14 @@ class Chirp2Impl final : public ServiceLayer ::Service {
   //reads chirps from a user stored in backend
   Status read(ServerContext* context, const ReadRequest* request, ReadReply* response); 
   //continuously streaming chirps from all followers all saved in the backend
-  Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer); 
+  Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
  private:
   int chirps_ = 0; //Total umber of chirps 
   chirp::Chirp convertToChirp(std::string byte);
   chirp::ChirpReplies convertToChirpReplies(std::string byte);
   void copyChirp(chirp::Chirp* c, const chirp::Chirp &r);
+  void printall(chirp::User user);
+  chirp::User stringToUser(std::string byte);
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

@@ -12,8 +12,12 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
   std::lock_guard<std::mutex> lock(mymutex_);
   GetRequest request;
   bool found = false;
+
   while (stream->Read(&request)) {
     auto it = data_.find(request.key());
+    for(const auto &i :data_) {
+      std::cout << "key: "<< i.first <<std::endl;
+    }
     if (it != data_.end()) {
       GetReply reply;
       reply.set_value(it->second);

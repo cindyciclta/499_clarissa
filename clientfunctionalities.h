@@ -7,11 +7,14 @@
 #include <map>
 
 #include <grpcpp/grpcpp.h>
+#include <grpcpp/client_context.h>
 #include "chirp.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
+using grpc::ServerBuilder;
+using grpc::ServerContext;
 
 using chirp::RegisterRequest;
 using chirp::RegisterReply;

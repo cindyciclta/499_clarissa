@@ -12,7 +12,7 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
   Status status = stub_->put(&context, request, &reply);
 
   if (status.ok()) {
-    std::cout << "status is ok" << std::endl;
+    // std::cout << "status is ok" << std::endl;
   } else {
     std::cout << "Problem with put function of service layer"<<std::endl;
   }
@@ -37,7 +37,7 @@ std::vector<std::string> ClientForKeyValueStore::get(const std::string &key) {
   Status status = stream->Finish();
 
   if (status.ok()) {
-    std::cout << "status is ok from get" << std::endl;
+    // std::cout << "status is ok from get" << std::endl;
   }
   else {
     replies.push_back("not found");
@@ -111,7 +111,15 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
     message->set_parent_id(request->parent_id());
     message->SerializeToString(&value);
   }
+
   user.SerializeToString(&userKey);
+  std::string test;
+  {
+    chirp::User testuser;
+    testuser.ParseFromString(userKey);
+    printall(testuser);
+    // std::cout << "test _____________ "<< testuser.username() << " "<< testuser.chirps_size() <<std::endl;
+  }
   clientKey.put(request->username(),userKey); //Adds Chirp to User proto 
 
   clientKey.put("chirp"+std::to_string(chirps_),value);//Add Chirp to backend
@@ -194,13 +202,54 @@ chirp::ChirpReplies Chirp2Impl::convertToChirpReplies(std::string byte) {
   replies.ParseFromString(byte);
   return replies;
 }
+chirp::User Chirp2Impl::stringToUser(std::string byte) {
+  chirp::User user;
+  user.ParseFromString(byte);
+
+  return user;
+}
+
+void Chirp2Impl::printall(chirp::User user) {
+  std::cout << std::endl;
+  std::cout << user.username() <<std::endl;
+  std::cout << "size of followers :" << user.followers().username_size() <<std::endl;
+  for(int i=0; i< user.followers().username_size(); i++) {
+    std::cout << "following: "<< user.followers().username(i)<<std::endl;
+  }
+  std::cout << "size of chirps :" << user.chirps_size() <<std::endl;
+    for(int i=0; i< user.chirps_size(); i++) {
+    std::cout << "chirps: "<< user.chirps(i).text()<<std::endl;
+  }
+  std::cout << std::endl;
+}
 Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer) {
   //TODO: Takes a request from service layer, continuiously sends data from backend storage 
+  std::cout << "HERE?!"<<std::endl;
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
   auto fromget = clientKey.get(request->username());
 
-  chirp::User user;
+  chirp::MonitorReply reply;
+  chirp::User user; //main User
   user.ParseFromString(fromget[0]);
+  std::cout << "Main user: " <<user.username() <<std::endl;
+  printall(user);
+  chirp::Followers followers = user.followers();
 
+  for (int i = 0; i < followers.username_size(); i++) {
+    auto allfollowers = clientKey.get(followers.username(i));
+    if(allfollowers[0] != "not found") {
+      chirp::User userFollowers = stringToUser(allfollowers[i]);
+      // printall(userFollowers);
+      for(int j = 0; j < userFollowers.chirps_size(); j++) {
+        chirp::Chirp* c = reply.mutable_chirp();
+        copyChirp(c, userFollowers.chirps(i));
+        writer->Write(reply);
+        reply.clear_chirp();
+      }
+    }
+  }
+
+
+  // writer->Writer()
   return Status::OK;
 }
