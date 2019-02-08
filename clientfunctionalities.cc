@@ -1,7 +1,6 @@
 #include "clientfunctionalities.h"
 
 void ClientFunctionalities::registeruser(const std::string &username) {
-  std::cout << "in registeruser "<<std::endl;
   chirp::RegisterRequest request;
   request.set_username(username);
   chirp::RegisterReply reply;
