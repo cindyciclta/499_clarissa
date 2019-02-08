@@ -1,5 +1,5 @@
-#ifndef CHIRP_IMPL_H
-#define CHIRP_IMPL_H
+#ifndef KEYVALUESTOREVIRTUAL_H
+#define KEYVALUESTOREVIRTUAL_H
 
 #include <iostream>
 #include <memory>
@@ -28,21 +28,23 @@ using chirp::DeleteReply;
 /**
     ChirpImpl is to handle request from Service Layer and submit a response back
 **/
-class ChirpImpl final : public KeyValueStore::Service {
+class KeyValueStoreVirtual : public KeyValueStore::Service {
  public:
   //handles request for put from the service layer
-  Status put(ServerContext* context, const PutRequest* request, PutReply* response); 
+  virtual Status put(ServerContext* context, const PutRequest* request, PutReply* response); 
   //handles request for monitor from service layer
-  Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream);
+  virtual Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream);
   //handles delete request from the service layer
-  Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
- private:
+  virtual Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
+ 
+ protected:
   //Attempt to store all data in this Map. Key is serialized username or ID, values (serialized) stores user's info, or chirps, respectively.
   //TODO: Will need to implement threadsafe functionalities with this
-  std::unordered_map<std::string, std::string>  data_;
+  // std::unordered_map<std::string, std::string>  data_;
+  // std::vector <std::vector <std::string> > data_;
   //mutex to safely lock threads from accessing data_ at the same time
-  std::mutex mymutex_;
-  void addkey(const std::string &key, const std::string &value);
+  // std::mutex mymutex_;
+  virtual void addkey(const std::string &key, const std::string &value);
 };
 
-#endif //CHIRP_IMPL_H
+#endif //KEYVALUESTOREVIRTUAL_H

@@ -4,18 +4,16 @@ Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutRepl
   //TODO: Recieving request from service layer and saving object into backend and returning a response
   std::lock_guard<std::mutex> lock(mymutex_);
   addkey(request->key(), request->value());
-
+  std::cout << "PUT"<<std::endl;
   return Status::OK;
 }
+
 Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
   //TODO: Streaming chirps to user
   std::lock_guard<std::mutex> lock(mymutex_);
   GetRequest request;
   bool found = false;
   while (stream->Read(&request)) {
-    for(const auto &i: data_) {
-      std::cout << i.first << std::endl;
-    }
     auto it = data_.find(request.key());
     if (it != data_.end()) {
       GetReply reply;
@@ -32,6 +30,7 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
   std:: cout << std::endl;
   return Status::OK;
 }
+
 void ChirpImpl::addkey(const std::string &key, const std::string &value) {
   auto it = data_.find(key);
   if(it != data_.end()) {

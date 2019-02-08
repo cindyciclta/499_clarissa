@@ -4,7 +4,7 @@
     Implementing Functionalities for ClientForKeyValueStore
 */
 void ClientForKeyValueStore::put(const std::string &key, const std::string &value) {
-  std::cout << std::endl;
+  std::cout << "INSHIDE HERE"<<std::endl;
   chirp::PutRequest request;
   request.set_key(key);
   request.set_value(value);
@@ -57,6 +57,7 @@ Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* r
   /* 
     Tested: Able to add new users
   */
+ std::cout << "insideeeee "<<std::endl;
   std::string value; 
   {
     chirp::User userValue;
@@ -197,5 +198,6 @@ chirp::ChirpReplies Chirp2Impl::convertToChirpReplies(std::string byte) {
 }
 Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer) {
   //TODO: Takes a request from service layer, continuiously sends data from backend storage 
+  
   return Status::OK;
 }
