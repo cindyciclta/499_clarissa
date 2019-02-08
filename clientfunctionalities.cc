@@ -80,16 +80,9 @@ void ClientFunctionalities::monitor(const std::string &username) {
   std::unique_ptr <grpc::ClientReader<chirp::MonitorReply> > reader(stub_->monitor(&context, request));
   while(true) {
     if(reader->Read(&reply)) {
-      std::cout << "UTLIMATE TEST MONITORR: "<<reply.chirp().username() <<std::endl;
+      std::cout << reply.chirp().username() << ": "<< reply.chirp().text()<<std::endl;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
-  // while(reader->Read(&reply)) {
-  //   std::cout << "UTLIMATE TEST MONITORR: "<<reply.chirp().username() <<std::endl;
-  // }
-  // if (status.ok()) {
-  //   std::cout << "status is ok: ClientFunctionalities" << std::endl;
-  // } else {
-  //   std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
-  // }
+
 }

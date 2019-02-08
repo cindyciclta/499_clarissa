@@ -240,6 +240,7 @@ Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request
     if(allfollowers[0] != "not found") {
       chirp::User userFollowers = stringToUser(allfollowers[i]);
       // printall(userFollowers);
+      // std:: cout << "dont tell me there isnt any chips "<< userFollowers.followers().username_size() <<std::endl;
       for(int j = 0; j < userFollowers.chirps_size(); j++) {
         chirp::Chirp* c = reply.mutable_chirp();
         copyChirp(c, userFollowers.chirps(i));

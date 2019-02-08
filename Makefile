@@ -26,7 +26,7 @@ backend: chirp.pb.o chirp.grpc.pb.o backend.o chirpimpl.cc chirpimpl.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags
 
 servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
