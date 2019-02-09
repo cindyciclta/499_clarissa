@@ -10,37 +10,47 @@
     Main function where the command line tool will be implemented. 
     TODO: Create a full implmentation of the command line tool
 **/
-// DEFINE_bool(big_menu, true, "Include 'advanced' options in the menu listing");
-// DEFINE_string(languages, "english,french,german", "comma-separated list of languages to offer in the 'lang' menu");
 DEFINE_string(user,"", "username of user using chrip");
-DEFINE_string(registeruser, "Register a new user with Chirp.", "register a new user with a username");
-DEFINE_string(chirp, "New Chirp.", "text of a new chirp from user");
-DEFINE_string(reply, "Reply to a chirp.", "replies a chirp with a new chirp");
-DEFINE_string(follow, "Follow another user.", "follows another user");
-DEFINE_string(read, "Read a chirp thread.", "reads the chirp thread starting at the given id");
-DEFINE_string(monitor, "Monitor all follower's chirps", "streams new chirps from those currently followed");
+DEFINE_string(registeruser, "", "register a new user with a username");
+DEFINE_string(chirp, "", "text of a new chirp from user");
+DEFINE_string(reply, "", "replies a chirp with a new chirp");
+DEFINE_string(follow, "", "follows another user");
+DEFINE_string(read, "", "reads the chirp thread starting at the given id");
+DEFINE_bool(monitor,false, "streams new chirps from those currently followed");
+
 static bool ValidateUser(const char* flagname, const std::string &value) {
+  if (FLAGS_registeruser != "" || value != "") {
+    return true;
+  }
+  return false;
+}
+
+static bool ValidateChirp(const char* flagname, const std::string &value) {
   if (value != "") {
     return true;
   }
   return false;
 }
+static bool ValidateReply(const char* flagname, const std::string &value) {
+  if (value != "") {
+    return ValidateChirp("chirp",FLAGS_chirp);
+  }
+  return true;
+}
+
+
+
 DEFINE_validator(user, &ValidateUser);
+DEFINE_validator(reply, &ValidateReply);
+
 int main(int argc, char** argv) {
   // gflags::ParseCommandLineFlags(&argc, &argv, true);
-  // if(FLAGS_user == "") {
-  //   std::cout << "Error, must have --user {username}" <<std::endl;
-  //   return -1;
-  // }
-  // std::cout << FLAGS_registeruser <<std::endl;
-  // std::cout << FLAGS_user << std::endl;
-  // std::cout << FLAGS_chirp << std::endl;
-  // std::cout<< "FLAGS_big_menu : " << FLAGS_big_menu << "\n" << FLAGS_languages << std::endl;
+
   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
   
   client.registeruser("user1");
   client.registeruser("user2");
-  // client.registeruser("user3");
+  client.registeruser("user3");
   client.follow("user1", "user2");
   client.follow("user2", "user1");
 
