@@ -56,11 +56,9 @@ int main(int argc, char** argv) {
     } else if (FLAGS_chirp != "" && FLAGS_reply != "") {
       client.chirp(FLAGS_user, FLAGS_chirp, FLAGS_reply);
     }
-
     if (FLAGS_follow != "") {
       client.follow(FLAGS_user, FLAGS_follow);
     }
-
     if (FLAGS_read != "") {
       client.read(FLAGS_read);
     }
