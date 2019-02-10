@@ -72,16 +72,14 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
 
 }
 void ClientFunctionalities::monitor(const std::string &username) {
-  //TODO: Continuiously stream chirps from all followed users. Sends a request to service layer
   chirp::MonitorRequest request;
   request.set_username(username);
   chirp::MonitorReply reply;
   ClientContext context;
   std::unique_ptr <grpc::ClientReader<chirp::MonitorReply> > reader(stub_->monitor(&context, request));
   while(true) {
-    std::cout << "how long is this"<<std::endl;
     if(reader->Read(&reply)) {
-      std::cout << "Monitor: "<<reply.chirp().username() << ": "<< reply.chirp().text()<<std::endl;
+      std::cout << "["<<reply.chirp().username() << "]: "<< reply.chirp().text()<<std::endl;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }

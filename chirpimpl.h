@@ -36,6 +36,7 @@ class ChirpImpl final : public KeyValueStore::Service {
   Status get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream);
   //handles delete request from the service layer
   Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
+
  private:
   //Attempt to store all data in this Map. Key is serialized username or ID, values (serialized) stores user's info, or chirps, respectively.
   //TODO: Will need to implement threadsafe functionalities with this

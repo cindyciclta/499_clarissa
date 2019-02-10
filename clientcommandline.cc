@@ -68,18 +68,7 @@ int main(int argc, char** argv) {
       client.monitor(FLAGS_user);
     }
   }
-  // client.registeruser("user1");
-  // client.registeruser("user2");
-  // client.registeruser("user3");
-  // client.follow("user1", "user2");
-  // client.follow("user2", "user1");
-
-  // client.chirp("user1", "testing chirp", "");
-  // client.chirp("user1", "testing chirp222222", "1");
-  // client.chirp("user2", "replying to 1", "1");
-  // client.read("1");
-  
-  // client.monitor("user2");
+  //TODO output errors 
   return  0;
 }
 

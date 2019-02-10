@@ -3,6 +3,7 @@
 /*
     Implementing Functionalities for ClientForKeyValueStore
 */
+
 void ClientForKeyValueStore::put(const std::string &key, const std::string &value) {
   chirp::PutRequest request;
   request.set_key(key);
@@ -12,13 +13,12 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
   Status status = stub_->put(&context, request, &reply);
 
   if (status.ok()) {
-    // std::cout << "status is ok" << std::endl;
+    std::cout << "status is ok" << std::endl;
   } else {
     std::cout << "Problem with put function of service layer"<<std::endl;
   }
 }
 std::vector <std::string> ClientForKeyValueStore::get(const std::string &key) {
-  //TODO: Functionality from commandline client that takes a key and call 'get' function from Service Layer
   std::vector <std::string> replies;
   chirp::GetRequest request;
   request.set_key(key);
@@ -33,22 +33,28 @@ std::vector <std::string> ClientForKeyValueStore::get(const std::string &key) {
   while(stream->Read(&reply)) {
     replies.push_back(reply.value());
   }
-  //TODO: multithreading for multitasks
+
   Status status = stream->Finish();
 
   if (status.ok()) {
-    // std::cout << "status is ok from get" << std::endl;
+    std::cout << "status is ok from get" << std::endl;
   }
 
   return replies;
 }
 void ClientForKeyValueStore::deletekey(const std::string &key) {
-  //TODO: Functionality from commandline client that takes a key and 'deletekey' function from service
+ 
 }
 /*
     Implementing Functionalities for Chirp2Impl
 */
-
+Chirp2Impl::Chirp2Impl() {
+  ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
+  std::vector <std::string> fromget = clientKey.get("chirps_");
+  if (fromget.size() != 0) {
+    chirps_ = std::stoi(fromget[0]);
+  }
+}
 Status Chirp2Impl::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
   /* 
@@ -105,6 +111,7 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
     std::lock_guard<std::mutex> lock(mymutex_);
     ++chirps_;
     nextChirpID = std::to_string(chirps_);
+    clientKey.put("chirps_", nextChirpID);
   }
   chirp::User user;
 
@@ -122,7 +129,6 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
     chirp::Chirp* message = user.add_chirps();
     message->set_username(request->username());
     message->set_text(request->text());
-    // std::lock_guard<std::mutex> lock(*mymutex_);
     message->set_id(nextChirpID);  
     //TODO: Timestamp
     message->set_parent_id(request->parent_id());
@@ -135,7 +141,7 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
     chirp::User testuser;
     testuser.ParseFromString(userKey);
     printall(testuser);
-    // std::cout << "test _____________ "<< testuser.username() << " "<< testuser.chirps_size() <<std::endl;
+    
   }
   clientKey.put(request->username(),userKey); //Adds Chirp to User proto 
 
@@ -168,13 +174,7 @@ Status Chirp2Impl::chirp(ServerContext* context, const ChirpRequest* request, Ch
   
   return Status::OK;
 }
-// int Chirp2Impl::getNextChirp() {
-//   ++chirps_;
-//   return chirps_;
-// }
 
-//TODO: Start with first ChipID and call get from that.
-//Then get Reply chips to that, and keep going on!
 Status Chirp2Impl::read(ServerContext* context, const ReadRequest* request, ReadReply* response) {
   /*
     Tested: Able to get all chirps and it's replies and send it back via ReadReply
@@ -255,8 +255,7 @@ void Chirp2Impl::printall(chirp::User user) {
 
 Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request, 
   ::grpc::ServerWriter< ::chirp::MonitorReply>* writer) {
-  //TODO: Takes a request from service layer, continuiously sends data from backend storage 
- 
+
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
   auto fromget = clientKey.get(request->username());
   
@@ -266,32 +265,29 @@ Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request
   std::set<std::string> chirpsent;
   chirp::User user; //main User
   user.ParseFromString(fromget[0]);
-  std::cout << "Main user: " <<user.username() <<std::endl;
-  printall(user);
+
   chirp::MonitorReply reply;
   chirp::Followers followers = user.followers();
-
+  int size = followers.username_size();
   while (true) {
-    for (int i = 0; i < followers.username_size(); i++) {
+
+    for (int i = 0; i < size; i++) {
       auto allfollowers = clientKey.get(followers.username(i));
+
       if(allfollowers.size() > 0) {
-        chirp::User userFollowers = stringToUser(allfollowers[i]);
-        // printall(userFollowers);
-        // std:: cout << "dont tell me there isnt any chips "<< userFollowers.followers().username_size() <<std::endl;
+        chirp::User userFollowers;
+        std::string temp = allfollowers[0];
+        userFollowers.ParseFromString(temp);
         for(int j = 0; j < userFollowers.chirps_size(); j++) {
-          auto it = chirpsent.find(userFollowers.chirps(i).id());
-      
+          auto it = chirpsent.find(userFollowers.chirps(j).id());
+
           if (it == chirpsent.end()) {
-            chirpsent.insert(userFollowers.chirps(i).id());
+            chirpsent.insert(userFollowers.chirps(j).id());
             chirp::Chirp* c = reply.mutable_chirp();
-            std::cout << "printing " << userFollowers.chirps(i).id() <<std::endl;
-            std::cout << "print text "<< userFollowers.chirps(i).text() <<std::endl;
-            copyChirp(c, userFollowers.chirps(i));
+            copyChirp(c, userFollowers.chirps(j));
             writer->Write(reply);
             reply.clear_chirp();
-          } else {
-            std::cout << "wow didnt work "<<std::endl;
-          }
+          } 
         }
       }
     }
@@ -300,3 +296,4 @@ Status Chirp2Impl::monitor(ServerContext* context, const MonitorRequest* request
 
   return Status::OK;
 }
+

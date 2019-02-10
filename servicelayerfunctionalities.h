@@ -65,7 +65,7 @@ class ClientForKeyValueStore {
 */
 class Chirp2Impl final : public ServiceLayer ::Service {
  public:
-  explicit Chirp2Impl(){}
+  Chirp2Impl();
   //Deletes users in backend
   Status registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response);
   //add chirps into backend storage
@@ -78,14 +78,12 @@ class Chirp2Impl final : public ServiceLayer ::Service {
   Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
  private:
   int chirps_ = 0; //Total umber of chirps 
-  int getNextChirpID();
-  std::mutex mymutex_;
-  chirp::Chirp convertToChirp(std::string byte);
-  chirp::ChirpReplies convertToChirpReplies(std::string byte);
-  void copyChirp(chirp::Chirp* c, const chirp::Chirp &r);
+  std::mutex mymutex_; //mutex to lock chirps_
+  chirp::Chirp convertToChirp(std::string byte); //Converts serialized string to a Chirp
+  chirp::ChirpReplies convertToChirpReplies(std::string byte); //Concerts Chirps to ChirpReplies
+  void copyChirp(chirp::Chirp* c, const chirp::Chirp &r); //Copy chirps
   void printall(chirp::User user);
-  chirp::User stringToUser(std::string byte);
-  void monitorSendData(chirp::User &user, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer, ClientForKeyValueStore & clientKey);
+  chirp::User stringToUser(std::string byte); //Take serialize string and return a User
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_
