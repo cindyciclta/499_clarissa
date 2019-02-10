@@ -169,29 +169,6 @@ TEST(ServiceLayerChrip, statisOK) {
 }
 
 
-//   This ServiceLayerTest will test if the commandline client can successfully request to register a user to the service layer via GRPC
-
-
-// TEST(ServiceLayerTest, statisOK)
-// {
-//   testing::internal::CaptureStdout();
-    
-//   client.registeruser("user1");
-//   client.registeruser("user2");
-//   client.registeruser("user3");
-//   client.follow("user1", "user2");
-//   client.chirp("user1", "testing chirp", "none");
-//   client.chirp("user1", "testing chirp222222", "1");
-//   client.chirp("user2", "replying to 1", "1");
-//   auto chirpthread = client.read("1");
-//   auto it = chirpthread.begin();
-
-//   for(const auto& i : chirpthread) {
-//     std::cout << i.first << ": "<< i.second << std::endl;
-//   }
-// }
-
-
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv); 
   return RUN_ALL_TESTS();
