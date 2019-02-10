@@ -1,12 +1,12 @@
 
-#include "chirpimpl.h"
+#include "keyvaluestoreserver.h"
 /*
     RunServer() runs the backend server and recieves any requests from the Service Layer
 */
 void RunServer() {
   std::string server_address("0.0.0.0:50000");
 
-  ChirpImpl service;
+  KeyValueStoreServer service;
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
 

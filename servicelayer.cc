@@ -3,7 +3,7 @@
 void RunServer() {
   std::string server_address("0.0.0.0:50002");
 
-  Chirp2Impl service;
+  ServerForCommandLineClient service;
   ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
 
