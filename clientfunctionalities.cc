@@ -47,7 +47,7 @@ void ClientFunctionalities::follow(const std::string &username, const std::strin
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
 }
-std::multimap<std::string, std::string> ClientFunctionalities::read(const std::string &chirp_id) {
+void ClientFunctionalities::read(const std::string &chirp_id) {
   /* 
     Tested: Able to recieve replied chirps from chirp_id!
   */
@@ -60,7 +60,7 @@ std::multimap<std::string, std::string> ClientFunctionalities::read(const std::s
   std::multimap <std::string,std::string> mymap;
   for (int i = 0; i < reply.chirps_size(); i++) {
     chirp::Chirp c = reply.chirps(i);
-    mymap.emplace(c.username(),c.text()); 
+    std::cout << "["<<c.username() << "]: "<< c.text() << std::endl;
     //TODO: Add Timestamp with this
   }
 
@@ -69,7 +69,7 @@ std::multimap<std::string, std::string> ClientFunctionalities::read(const std::s
   } else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
-  return mymap;
+
 }
 void ClientFunctionalities::monitor(const std::string &username) {
   //TODO: Continuiously stream chirps from all followed users. Sends a request to service layer
@@ -79,8 +79,9 @@ void ClientFunctionalities::monitor(const std::string &username) {
   ClientContext context;
   std::unique_ptr <grpc::ClientReader<chirp::MonitorReply> > reader(stub_->monitor(&context, request));
   while(true) {
+    std::cout << "how long is this"<<std::endl;
     if(reader->Read(&reply)) {
-      std::cout << reply.chirp().username() << ": "<< reply.chirp().text()<<std::endl;
+      std::cout << "Monitor: "<<reply.chirp().username() << ": "<< reply.chirp().text()<<std::endl;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }

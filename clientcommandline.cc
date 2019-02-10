@@ -44,25 +44,42 @@ DEFINE_validator(user, &ValidateUser);
 DEFINE_validator(reply, &ValidateReply);
 
 int main(int argc, char** argv) {
-  // gflags::ParseCommandLineFlags(&argc, &argv, true);
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-  
-  client.registeruser("user1");
-  client.registeruser("user2");
-  client.registeruser("user3");
-  client.follow("user1", "user2");
-  client.follow("user2", "user1");
 
-  client.chirp("user1", "testing chirp", "none");
-  client.chirp("user1", "testing chirp222222", "1");
-  client.chirp("user2", "replying to 1", "1");
-  client.monitor("user2");
-  auto chirpthread = client.read("1");
+  if (FLAGS_registeruser != "") {
+    client.registeruser(FLAGS_registeruser);
+  } else if (FLAGS_user != "") {
+    if (FLAGS_chirp != "" && FLAGS_reply == "") {
+      client.chirp(FLAGS_user, FLAGS_chirp, "");
+    } else if (FLAGS_chirp != "" && FLAGS_reply != "") {
+      client.chirp(FLAGS_user, FLAGS_chirp, FLAGS_reply);
+    }
 
-  for(const auto& i : chirpthread) {
-    std::cout << i.first << ": "<< i.second << std::endl;
+    if (FLAGS_follow != "") {
+      client.follow(FLAGS_user, FLAGS_follow);
+    }
+
+    if (FLAGS_read != "") {
+      client.read(FLAGS_read);
+    }
+    if (FLAGS_monitor) {
+      client.monitor(FLAGS_user);
+    }
   }
+  // client.registeruser("user1");
+  // client.registeruser("user2");
+  // client.registeruser("user3");
+  // client.follow("user1", "user2");
+  // client.follow("user2", "user1");
+
+  // client.chirp("user1", "testing chirp", "");
+  // client.chirp("user1", "testing chirp222222", "1");
+  // client.chirp("user2", "replying to 1", "1");
+  // client.read("1");
+  
+  // client.monitor("user2");
   return  0;
 }
 

@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 #include <queue>
+#include <thread>
+#include <set>
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/client_context.h>
@@ -45,7 +47,7 @@ using chirp::ServiceLayer;
 */
 class ClientForKeyValueStore {
  public:
-  explicit ClientForKeyValueStore(std::shared_ptr<Channel> channel) :stub_(KeyValueStore::NewStub(channel)) {}
+  explicit ClientForKeyValueStore(std::shared_ptr<Channel> channel) :stub_(KeyValueStore::NewStub(channel)){}
   //put data into backend
   void put(const std::string &key, const std::string &value); 
   //get information from backend
@@ -63,6 +65,7 @@ class ClientForKeyValueStore {
 */
 class Chirp2Impl final : public ServiceLayer ::Service {
  public:
+  explicit Chirp2Impl(){}
   //Deletes users in backend
   Status registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response);
   //add chirps into backend storage
@@ -75,11 +78,14 @@ class Chirp2Impl final : public ServiceLayer ::Service {
   Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
  private:
   int chirps_ = 0; //Total umber of chirps 
+  int getNextChirpID();
+  std::mutex mymutex_;
   chirp::Chirp convertToChirp(std::string byte);
   chirp::ChirpReplies convertToChirpReplies(std::string byte);
   void copyChirp(chirp::Chirp* c, const chirp::Chirp &r);
   void printall(chirp::User user);
   chirp::User stringToUser(std::string byte);
+  void monitorSendData(chirp::User &user, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer, ClientForKeyValueStore & clientKey);
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

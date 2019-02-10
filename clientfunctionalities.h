@@ -43,7 +43,7 @@ class ClientFunctionalities {
   //follow a chirper with this username
   void follow(const std::string &username, const std::string &to_follow); 
   //read all the chirps from this user
-  std::multimap <std::string, std::string> read(const std::string &chirp_id); 
+  void read(const std::string &chirp_id); 
   //read all the chirps that their followers chirped
   void monitor(const std::string &username); 
  private:
