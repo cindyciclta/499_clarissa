@@ -1,6 +1,9 @@
 #include "clientfunctionalities.h"
 
 void ClientFunctionalities::registeruser(const std::string &username) {
+  if (username == "") {
+    return;
+  }
   chirp::RegisterRequest request;
   request.set_username(username);
   chirp::RegisterReply reply;
@@ -9,7 +12,7 @@ void ClientFunctionalities::registeruser(const std::string &username) {
   Status status = stub_->registeruser(&context, request, &reply);
 
   if (status.ok()) {
-    std::cout << "status is ok: ClientFunctionalities" << std::endl;
+    std::cout << "Registered user: "<< username << std::endl;
   } else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
@@ -19,14 +22,13 @@ void ClientFunctionalities::chirp(const std::string &username, const std::string
   request.set_username(username);
   request.set_text(text);
   request.set_parent_id(parent_id);
-  //TODO: count chirps and make it as chirp ID
-  //TODO: Timestamp
+  
   chirp::ChirpReply reply;
   ClientContext context;
   Status status = stub_->chirp(&context, request, &reply);
-
+  std::cout << "test this bitch "<< static_cast<int64_t>(reply.chirp().timestamp().seconds())<<std::endl;
   if (status.ok()) {
-    std::cout << "status is ok: ClientFunctionalities" << std::endl;
+    std::cout << "Successfully chirped!" << std::endl;
   } else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
@@ -42,7 +44,7 @@ void ClientFunctionalities::follow(const std::string &username, const std::strin
   Status status = stub_->follow(&context, request, &reply);
 
   if (status.ok()) {
-    std::cout << "status is ok: ClientFunctionalities" << std::endl;
+    std::cout << "Sucessfully followed: "<< to_follow << std::endl;
   } else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }
@@ -58,14 +60,16 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
   Status status = stub_->read(&context, request, &reply);
 
   std::multimap <std::string,std::string> mymap;
+  std::cout << "size: "<< reply.chirps_size() <<std::endl;
   for (int i = 0; i < reply.chirps_size(); i++) {
     chirp::Chirp c = reply.chirps(i);
-    std::cout << "["<<c.username() << "]: "<< c.text() << std::endl;
-    //TODO: Add Timestamp with this
+    std::time_t seconds = c.timestamp().seconds();
+    // std::asctime(std::localtime(&seconds));
+    std::cout << "["<<c.username() << " " <<std::asctime(std::localtime(&seconds)) << "]: "<< c.text() << std::endl;
   }
 
   if (status.ok()) {
-    std::cout << "status is ok: ClientFunctionalities" << std::endl;
+    // std::cout << "Successfully read all chirps with thread chirp"<< chirp_id << std::endl;
   } else {
     std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
   }

@@ -23,16 +23,16 @@ vpath %.proto $(PROTOS_PATH)
 all: test backend clientcommandline servicelayer
 
 backend: chirp.pb.o chirp.grpc.pb.o backend.o keyvaluestoreserver.cc keyvaluestoreserver.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lglog
 
 clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags -lglog
 
 servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lglog
 
 test: chirp.pb.o chirp.grpc.pb.o test.o clientfunctionalities.o clientfunctionalities.h servicelayerfunctionalities.o servicelayerfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lglog
 
 .PRECIOUS: %.grpc.pb.cc
 %.grpc.pb.cc: %.proto

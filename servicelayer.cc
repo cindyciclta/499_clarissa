@@ -16,6 +16,7 @@ void RunServer() {
 }
 
 int main(int argc, char** argv) {
+  google::InitGoogleLogging(argv[0]);
   RunServer();
     
   return 0;

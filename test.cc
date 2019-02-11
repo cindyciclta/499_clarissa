@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "clientfunctionalities.h"
-#include "chirpimpl.h"
+#include "keyvaluestoreserver.h"
 
 
 using grpc::Channel;

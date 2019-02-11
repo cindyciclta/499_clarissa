@@ -6,10 +6,14 @@
 #include <queue>
 #include <thread>
 #include <set>
+#include <ctime>
+#include <ratio>
+#include <chrono>
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/client_context.h>
 #include "chirp.grpc.pb.h"
+#include <glog/logging.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -40,6 +44,9 @@ using chirp::ReadReply;
 using chirp::MonitorRequest;
 using chirp::MonitorReply;
 using chirp::ServiceLayer;
+
+using namespace std::chrono;
+using time_stamp = std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds>;
 
 /*
     ClientForKeyValueStore class is for the functionalities that the service layer will call when 
@@ -154,6 +161,11 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
     Converts serialize string to chirp::User.
   */
   chirp::User stringToUser(std::string byte);
+  /*
+    Copy chirp to ChirpReply's chirp.
+  */
+  void setChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
+  void printallChirp(chirp::Chirp c);
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_
