@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <queue>
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/client_context.h>
@@ -48,7 +49,7 @@ class ClientForKeyValueStore {
   //put data into backend
   void put(const std::string &key, const std::string &value); 
   //get information from backend
-  std::string get(const std::string &key);
+  std::vector<std::string> get(const std::string &key);
   //delete infromation in backend 
   void deletekey(const std::string &key); 
   
@@ -74,6 +75,9 @@ class Chirp2Impl final : public ServiceLayer ::Service {
   Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter< ::chirp::MonitorReply>* writer); 
  private:
   int chirps_ = 0; //Total umber of chirps 
+  chirp::Chirp convertToChirp(std::string byte);
+  chirp::ChirpReplies convertToChirpReplies(std::string byte);
+  void copyChirp(chirp::Chirp* c, const chirp::Chirp &r);
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

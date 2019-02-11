@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 
 #include "clientfunctionalities.h"
-#include "chirpimpl.cc"
-#include "backend_client_unit_test.h"
+#include "chirpimpl.h"
+
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -32,14 +32,17 @@ using chirp::KeyValueStore;
 std::unordered_map<std::string, std::string >  data_;
 class BackendClientTest {
  public:
-  void put(std::string key, std::string value) {
+  void put(const std::string &key, const std::string &value) {
     addkey(key, value);
   }
-  std::string get(std::string key) {
+  std::string get(const std::string &key) {
     auto it = data_.find(key);
       if(it != data_.end()) {
         return it->second;
       } 
+  }
+  void chirp(const std::string &key, const std::string &text, const std::string &parent_id) {
+
   }
  private:
   void addkey(const std::string &key, const std::string &value) {
@@ -131,10 +134,63 @@ TEST(ServiceLayerRegisteruser, statisOK) {
   chirp::Username user3;
   user3.set_username("Cindyclarissa");
   user3.SerializeToString(&key2);
-  
+
   auto it = data_.find(key2);
   EXPECT_EQ(key,it->first);
 }
+/*  
+  ServiceLayerChrip tests if you are able to add chirps 
+*/
+TEST(ServiceLayerChrip, statisOK) {
+  BackendClientTest client;
+  std::string key, value;
+
+  chirp::Username user;
+  user.set_username("user1");
+  user.SerializeToString(&key);
+
+  chirp::User user2;
+  user2.set_username("user2");
+  user2.SerializeToString(&value);
+
+  client.put(key, value);
+  ASSERT_TRUE(data_.size() != 0);
+  EXPECT_EQ(1,data_.size());
+  
+  client.chirp("user1", "testing chirp", "1");
+
+  std::string test;
+  {
+    std::string chirpmsg = client.get("chirp1");
+    chirp::Chirp c;
+    c.ParseFromString(value);
+    EXPECT_EQ("testing chirp",c.text());
+  }
+}
+
+
+//   This ServiceLayerTest will test if the commandline client can successfully request to register a user to the service layer via GRPC
+
+
+// TEST(ServiceLayerTest, statisOK)
+// {
+//   testing::internal::CaptureStdout();
+    
+//   client.registeruser("user1");
+//   client.registeruser("user2");
+//   client.registeruser("user3");
+//   client.follow("user1", "user2");
+//   client.chirp("user1", "testing chirp", "none");
+//   client.chirp("user1", "testing chirp222222", "1");
+//   client.chirp("user2", "replying to 1", "1");
+//   auto chirpthread = client.read("1");
+//   auto it = chirpthread.begin();
+
+//   for(const auto& i : chirpthread) {
+//     std::cout << i.first << ": "<< i.second << std::endl;
+//   }
+// }
+
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv); 

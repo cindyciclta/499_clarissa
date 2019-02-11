@@ -3,6 +3,9 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
+#include <map>
+
 #include <grpcpp/grpcpp.h>
 #include "chirp.grpc.pb.h"
 
@@ -29,7 +32,7 @@ using chirp::KeyValueStore;
 class ClientFunctionalities {
  public:
   //Constructor take takes in a shared pointer of Channel
-  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) :stub_(chirp::ServiceLayer::NewStub(channel)) {}
+  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) : stub_(chirp::ServiceLayer::NewStub(channel)) {}
   //Create a new user with username
   void registeruser(const std::string &username); 
   //add a chirp to this username
@@ -37,7 +40,7 @@ class ClientFunctionalities {
   //follow a chirper with this username
   void follow(const std::string &username, const std::string &to_follow); 
   //read all the chirps from this user
-  void read(const std::string &chirp_id); 
+  std::multimap <std::string, std::string> read(const std::string &chirp_id); 
   //read all the chirps that their followers chirped
   void monitor(const std::string &username); 
  private:

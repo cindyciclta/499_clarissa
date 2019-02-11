@@ -31,7 +31,7 @@ clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunction
 servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-test: chirp.pb.o chirp.grpc.pb.o test.o backendclientunittest.h clientfunctionalities.o clientfunctionalities.h servicelayerfunctionalities.o servicelayerfunctionalities.h
+test: chirp.pb.o chirp.grpc.pb.o test.o clientfunctionalities.o clientfunctionalities.h servicelayerfunctionalities.o servicelayerfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 .PRECIOUS: %.grpc.pb.cc

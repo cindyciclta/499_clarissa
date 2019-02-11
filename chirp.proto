@@ -102,6 +102,11 @@ message ID {
   bytes id = 1;
 } 
 
+message ChirpReplies {
+  bytes parent_id = 1;
+  repeated Chirp chirps = 2; //All of chirps replies as value in map.
+}
+
 service KeyValueStore {
   rpc put (PutRequest) returns (PutReply) {}
   rpc get (stream GetRequest) returns (stream GetReply) {}

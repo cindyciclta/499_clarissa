@@ -40,7 +40,6 @@ class ChirpImpl final : public KeyValueStore::Service {
   //Attempt to store all data in this Map. Key is serialized username or ID, values (serialized) stores user's info, or chirps, respectively.
   //TODO: Will need to implement threadsafe functionalities with this
   std::unordered_map<std::string, std::string>  data_;
-  // std::vector <std::vector <std::string> > data_;
   //mutex to safely lock threads from accessing data_ at the same time
   std::mutex mymutex_;
   void addkey(const std::string &key, const std::string &value);
