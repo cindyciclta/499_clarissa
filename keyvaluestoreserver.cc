@@ -1,19 +1,21 @@
-#include "chirpimpl.h"
+#include "keyvaluestoreserver.h"
 
-Status ChirpImpl::put(ServerContext* context, const PutRequest* request, PutReply* response) {
-  //TODO: Recieving request from service layer and saving object into backend and returning a response
+Status KeyValueStoreServer::put(ServerContext* context, const PutRequest* request, PutReply* response) {
   std::lock_guard<std::mutex> lock(mymutex_);
   addkey(request->key(), request->value());
   return Status::OK;
 }
 
-Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
-  //TODO: Streaming chirps to user
+Status KeyValueStoreServer::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
   std::lock_guard<std::mutex> lock(mymutex_);
   GetRequest request;
   bool found = false;
+
   while (stream->Read(&request)) {
     auto it = data_.find(request.key());
+    for(const auto &i :data_) {
+      std::cout << "key: "<< i.first <<std::endl;
+    }
     if (it != data_.end()) {
       GetReply reply;
       reply.set_value(it->second);
@@ -30,7 +32,7 @@ Status ChirpImpl::get(ServerContext* context, grpc::ServerReaderWriter< GetReply
   return Status::OK;
 }
 
-void ChirpImpl::addkey(const std::string &key, const std::string &value) {
+void KeyValueStoreServer::addkey(const std::string &key, const std::string &value) {
   auto it = data_.find(key);
   if(it != data_.end()) {
     it->second = value;
@@ -40,7 +42,7 @@ void ChirpImpl::addkey(const std::string &key, const std::string &value) {
    
 }
 
-Status ChirpImpl::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
+Status KeyValueStoreServer::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
   //TODO: Deletes info from backend storage
 
   return Status::OK;
