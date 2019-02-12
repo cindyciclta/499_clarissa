@@ -33,16 +33,19 @@ Status KeyValueStoreServer::get(ServerContext* context, grpc::ServerReaderWriter
 }
 Status KeyValueStoreServer::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
   std::lock_guard<std::mutex> lock(mymutex_);
-  auto it = data_.find(request.key());
-  if (it != data_.end()) {
-    data_.erase(it);
-  } else {
-    return Status::CANCELLED;
+  if (deletekeyhelper(request->key())) {
+    return Status::OK;
   }
-  return Status::OK;
+  return Status::CANCELLED;
 }
-
-
+bool KeyValueStoreServer::deletekeyhelper(const std::string &key) {
+  auto it = data_.find(key);
+  if(it != data_.end()) {
+    data_.erase(it);
+    return true;
+  }
+  return false;
+}
 void KeyValueStoreServer::addkey(const std::string &key, const std::string &value) {
   auto it = data_.find(key);
   if(it != data_.end()) {

@@ -7,7 +7,7 @@
 #include "clientfunctionalities.h"
 
 DEFINE_string(user,"", "username of user using chrip");
-DEFINE_string(registeruser, "", "register a new user with a username");
+DEFINE_string(register, "", "register a new user with a username");
 DEFINE_string(chirp, "", "text of a new chirp from user");
 DEFINE_string(reply, "", "replies a chirp with a new chirp");
 DEFINE_string(follow, "", "follows another user");
@@ -25,18 +25,8 @@ int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-    // client.registeruser("user1");
-    // client.registeruser("user2");
-    // client.registeruser("user3");
-    // client.follow("user1", "user2");
-    // client.follow("user1", "user3");
-    // client.follow("user1", "user4");
-    // client.chirp("user1", "testing chirp", "");
-    // client.chirp("user1", "testing chirp222222", "1");
-    // client.chirp("user2", "replying to 1", "1");
-    // client.read("1");
-  if (FLAGS_registeruser != "") {
-    client.registeruser(FLAGS_registeruser);
+  if (FLAGS_register != "") {
+    client.registeruser(FLAGS_register);
   } else if (FLAGS_user != "") {
     if (FLAGS_chirp != "" && FLAGS_reply == "") {
       client.chirp(FLAGS_user, FLAGS_chirp, "");
@@ -53,12 +43,11 @@ int main(int argc, char** argv) {
       client.monitor(FLAGS_user);
     }
   }
-  //TODO output errors 
   return  0;
 }
 
 static bool ValidateUser(const char* flagname, const std::string &value) {
-  if (FLAGS_registeruser != "" || value != "") {
+  if (FLAGS_register != "" || value != "") {
     return true;
   }
   return false;

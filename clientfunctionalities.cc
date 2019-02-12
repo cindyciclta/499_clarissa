@@ -14,7 +14,7 @@ void ClientFunctionalities::registeruser(const std::string &username) {
   if (status.ok()) {
     std::cout << "Registered user: "<< username << std::endl;
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+    std::cout << status.error_code() << ": " << "Register user unsuccessful: "<< username<< std::endl;
   }
 }
 void ClientFunctionalities::chirp(const std::string &username, const std::string &text, const std::string &parent_id) {
@@ -26,11 +26,11 @@ void ClientFunctionalities::chirp(const std::string &username, const std::string
   chirp::ChirpReply reply;
   ClientContext context;
   Status status = stub_->chirp(&context, request, &reply);
-  std::cout << "test this bitch "<< static_cast<int64_t>(reply.chirp().timestamp().seconds())<<std::endl;
+  
   if (status.ok()) {
-    std::cout << "Successfully chirped!" << std::endl;
+    std::cout << "Successfully chirped with id: "<< reply.chirp().id() << std::endl;
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+    std::cout << status.error_code() << ": " << "Chirp is unsuccessful. Try again."<< std::endl;
   }
   
 }
@@ -46,7 +46,7 @@ void ClientFunctionalities::follow(const std::string &username, const std::strin
   if (status.ok()) {
     std::cout << "Sucessfully followed: "<< to_follow << std::endl;
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+    std::cout << status.error_code() << ": " << "Following " << to_follow << " is unsuccessful" << std::endl;
   }
 }
 void ClientFunctionalities::read(const std::string &chirp_id) {
@@ -71,7 +71,7 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
   if (status.ok()) {
     // std::cout << "Successfully read all chirps with thread chirp"<< chirp_id << std::endl;
   } else {
-    std::cout << status.error_code() << ": " << status.error_message()<< std::endl;
+    std::cout << status.error_code() << ": " << "Reading thread "<< chirp_id << " is unsuccessful."<< std::endl;
   }
 
 }

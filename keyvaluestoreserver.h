@@ -49,6 +49,7 @@ class KeyValueStoreServer final : public KeyValueStore::Service {
   */
   Status deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response); 
 
+
  private:
   /* 
     Attempt to store all data in this Map. The key will be std::string of "{username}", "chirp<ID>",
@@ -65,6 +66,7 @@ class KeyValueStoreServer final : public KeyValueStore::Service {
     or put a new key in
   */
   void addkey(const std::string &key, const std::string &value);
+  bool deletekeyhelper(const std::string &key);
 };
 
 #endif //CHIRP_IMPL_H

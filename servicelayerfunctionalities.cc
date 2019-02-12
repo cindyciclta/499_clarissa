@@ -91,7 +91,10 @@ Status ServerForCommandLineClient::follow(ServerContext* context, const FollowRe
   /* 
     Tested: Able to add followers to user with an empty followers list and if there exist a followers list
   */
-        
+  if (request->username() == request->to_follow()) {
+    return Status::CANCELLED;
+  }
+
   std::string value;
   {
     chirp::User user;
@@ -128,8 +131,16 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
   std::string nextChirpID;
   {
     std::lock_guard<std::mutex> lock(mymutex_);
-    ++chirps_;
-    nextChirpID = std::to_string(chirps_);
+    // ++chirps_;
+    // nextChirpID = std::to_string(chirps_);
+    auto fromget = clientKey.get("chirps_");
+    if (fromget.size() == 0) {
+      nextChirpID = std::to_string(0);
+    } else {
+      int currchirpid = std::stoi(fromget[0]);
+      currchirpid++;
+      nextChirpID = std::to_string(currchirpid);
+    }
     clientKey.put("chirps_", nextChirpID);
   }
   //Get User
@@ -172,10 +183,8 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
       
       //If chirp id is not found, use the 'replies' as a new ChirpReplies and set parent_id()
       if (fromget.size() == 0) { 
-        std::cout << "setting chirpreplies reply"<< request->parent_id() <<std::endl;
         replies.set_parent_id(request->parent_id());
       } else { //If found, parse from existing ChirpReplies
-        std::cout << "found! no need to create chirp replies" <<std::endl;
         replies.ParseFromString(fromget[0]);
       }
       chirp::Chirp* reply = replies.add_chirps();
@@ -186,7 +195,6 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
       chirp::Timestamp* timestamp = reply->mutable_timestamp();
       timestamp->set_seconds(static_cast<int64_t>(seconds));
       timestamp->set_useconds(microseconds_since_epoch);
-      std::cout << "Size of chirp replies is "<< replies.chirps_size() <<std::endl;
       replies.SerializeToString(&value2);
     }
     clientKey.put("reply"+request->parent_id(),value2); //Add reply<ID> to backend
@@ -227,22 +235,25 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
     }
 
     chirp::ChirpReplies chirpReplies = convertToChirpReplies(fromget[0]);
-    std:: cout << "chirp id "<< currentChirp.id()<<std::endl;
-    std:: cout << "replies "<< chirpReplies.chirps_size()<<std::endl;
     for (int i = 0; i < chirpReplies.chirps_size(); i++) {
       myqueue.push(chirpReplies.chirps(i));
-      chirp::Chirp* c = response->add_chirps();
-      copyChirp(c, chirpReplies.chirps(i));
+      // chirp::Chirp* c = response->add_chirps();
+      // copyChirp(c, chirpReplies.chirps(i));
       chirpToSend.push_back(chirpReplies.chirps(i));
     }
   }
+  //sort by timestamp
   std::sort(chirpToSend.begin(), chirpToSend.end(), [](chirp::Chirp &a, chirp::Chirp &b){
-    return a.timestamp().seconds() < b.timestamp().seconds();
+    return a.timestamp().useconds() < b.timestamp().useconds();
   });
-  // for (const auto &i :chirpToSend) {
-  //   chirp::Chirp* c = response->add_chirps();
-  //   std::cout << i.text() <<std::endl;
-  // }
+  for (const auto &i :chirpToSend) {
+    if (i.id() == mainChirp->id()) {
+      continue;
+    }
+    chirp::Chirp* c = response->add_chirps();
+    copyChirp(c, i);
+    std::cout << i.text() <<std::endl;
+  }
   return Status::OK;
 }
 Status ServerForCommandLineClient::monitor(ServerContext* context, const MonitorRequest* request, 
@@ -282,12 +293,14 @@ Status ServerForCommandLineClient::monitor(ServerContext* context, const Monitor
           auto it = chirpsent.find(userFollowers.chirps(j).id());
 
           if (it == chirpsent.end()) {
-            if (userFollowers.chirps(j).timestamp().seconds() > seconds_since_epoch) {
+            if (userFollowers.chirps(j).timestamp().useconds() > microseconds_since_epoch) {
               chirpsent.insert(userFollowers.chirps(j).id());
 
               chirp::Chirp* c = reply.mutable_chirp();
               copyChirp(c, userFollowers.chirps(j));
-              writer->Write(reply);
+              if (!writer->Write(reply)) {
+                return Status::CANCELLED;
+              }
               reply.clear_chirp();
             }
           
