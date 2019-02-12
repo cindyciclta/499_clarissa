@@ -43,7 +43,17 @@ std::vector <std::string> ClientForKeyValueStore::get(const std::string &key) {
   return replies;
 }
 void ClientForKeyValueStore::deletekey(const std::string &key) {
- 
+  chirp::DeleteRequest request;
+  chirp::DeleteReply reply;
+
+  ClientContext context;
+  Status status = stub_->deletekey(&context, request, &reply);
+  if (status.ok()) {
+    // std::cout << "status is ok" << std::endl;
+  } else {
+    std::cout << "Problem with put function of service layer"<<std::endl;
+  }
+
 }
 /*
     Implementing Functionalities for ServerForCommandLineClient
@@ -112,7 +122,6 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
   */
   //Get TimeStamp
   std::time_t seconds = std::time(nullptr);
-  // std::cout << std::asctime(std::localtime(&seconds)) << seconds << " seconds since the Epoch\n";
   int64_t microseconds_since_epoch = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   
   //Get next chirp id, and lock it!
@@ -145,7 +154,7 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
     timestamp->set_useconds(microseconds_since_epoch);
     message->set_parent_id(request->parent_id());
     message->SerializeToString(&value);
-    // printallChirp(*message);
+    
     setChirpReply(message, response);
   }
 
@@ -193,6 +202,7 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
 
   std::vector <std::string> fromget = clientKey.get("chirp"+request->chirp_id());
+  std::vector <chirp::Chirp> chirpToSend;
   if (fromget.size() == 0) {
     return Status::CANCELLED;
   }
@@ -200,20 +210,22 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
 
   chirp::Chirp* mainChirp = response->add_chirps();
   mainChirp->ParseFromString(mainChirpMsg);
+  chirpToSend.push_back(*mainChirp);
 
   std::queue<chirp::Chirp> myqueue;
   myqueue.push(*mainChirp);
-  // printallChirp(*mainChirp);
-  //DFS
+  
+  //Running DFS to get threads related to chirp<id>
   while(!myqueue.empty()) {
     chirp::Chirp currentChirp = myqueue.front();
     myqueue.pop();
+    
     //Find other chirps that are in reply to this currentChirp
     fromget = clientKey.get("reply"+currentChirp.id());
     if(fromget.size() == 0) {
-      std::cout << "reply"<< currentChirp.id() << " is empty! "<< std::endl;
       continue;
     }
+
     chirp::ChirpReplies chirpReplies = convertToChirpReplies(fromget[0]);
     std:: cout << "chirp id "<< currentChirp.id()<<std::endl;
     std:: cout << "replies "<< chirpReplies.chirps_size()<<std::endl;
@@ -221,31 +233,42 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
       myqueue.push(chirpReplies.chirps(i));
       chirp::Chirp* c = response->add_chirps();
       copyChirp(c, chirpReplies.chirps(i));
+      chirpToSend.push_back(chirpReplies.chirps(i));
     }
   }
+  std::sort(chirpToSend.begin(), chirpToSend.end(), [](chirp::Chirp &a, chirp::Chirp &b){
+    return a.timestamp().seconds() < b.timestamp().seconds();
+  });
+  // for (const auto &i :chirpToSend) {
+  //   chirp::Chirp* c = response->add_chirps();
+  //   std::cout << i.text() <<std::endl;
+  // }
   return Status::OK;
 }
 Status ServerForCommandLineClient::monitor(ServerContext* context, const MonitorRequest* request, 
   ::grpc::ServerWriter< ::chirp::MonitorReply>* writer) {
-
+  //Get Current TimeStamp
   std::time_t seconds = std::time(nullptr);
   int64_t seconds_since_epoch= static_cast<int64_t>(seconds);
   int64_t microseconds_since_epoch = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
   
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
-  auto fromget = clientKey.get(request->username());
   
+  auto fromget = clientKey.get(request->username());
   if (fromget.size() == 0) {
     return Status::CANCELLED;
   }
+
   std::set<std::string> chirpsent;
   chirp::User user; //Main User
   user.ParseFromString(fromget[0]);
 
   chirp::MonitorReply reply;
   chirp::Followers followers = user.followers();
-  //Look through all user's followers, and their chirps. Keep all sent chirps in a set called
-  //chirpsent. Keep looking for new chirps with this while loop.
+  /*
+    Continuously look through all user's followers, and their chirps. Keep all sent chirps in a set called
+    chirpsent. Keep looking for new chirps with this while loop.
+  */
   while (true) {
     for (int i = 0; i < followers.username_size(); i++) {
       auto allfollowers = clientKey.get(followers.username(i));
@@ -254,16 +277,20 @@ Status ServerForCommandLineClient::monitor(ServerContext* context, const Monitor
         chirp::User userFollowers;
         std::string temp = allfollowers[0];
         userFollowers.ParseFromString(temp);
+
         for(int j = 0; j < userFollowers.chirps_size(); j++) {
           auto it = chirpsent.find(userFollowers.chirps(j).id());
 
           if (it == chirpsent.end()) {
-            chirpsent.insert(userFollowers.chirps(j).id());
+            if (userFollowers.chirps(j).timestamp().seconds() > seconds_since_epoch) {
+              chirpsent.insert(userFollowers.chirps(j).id());
 
-            chirp::Chirp* c = reply.mutable_chirp();
-            copyChirp(c, userFollowers.chirps(j));
-            writer->Write(reply);
-            reply.clear_chirp();
+              chirp::Chirp* c = reply.mutable_chirp();
+              copyChirp(c, userFollowers.chirps(j));
+              writer->Write(reply);
+              reply.clear_chirp();
+            }
+          
           } 
         }
       }
@@ -315,8 +342,8 @@ void ServerForCommandLineClient::printallChirp(chirp::Chirp c) {
   std::cout << std::endl;
   std::cout << c.username() <<std::endl;
   std::cout << c.text() <<std::endl;
-  // std::cout << c.timestamp().seconds() << std::endl;
-  // std::cout << c.timestamp().useconds() << std::endl;
+  std::cout << c.timestamp().seconds() << std::endl;
+  std::cout << c.timestamp().useconds() << std::endl;
   std::cout << "ID:" <<c.id() <<std::endl;
   std::cout << "parent id" <<c.parent_id() <<std::endl;
 }
