@@ -11,12 +11,6 @@ void ClientForKeyValueStore::put(const std::string &key, const std::string &valu
   chirp::PutReply reply;
   ClientContext context;
   Status status = stub_->put(&context, request, &reply);
-
-  if (status.ok()) {
-    // std::cout << "status is ok" << std::endl;
-  } else {
-    std::cout << "Problem with put function of service layer"<<std::endl;
-  }
 }
 std::vector <std::string> ClientForKeyValueStore::get(const std::string &key) {
   std::vector <std::string> replies;
@@ -36,10 +30,6 @@ std::vector <std::string> ClientForKeyValueStore::get(const std::string &key) {
 
   Status status = stream->Finish();
 
-  if (status.ok()) {
-    // std::cout << "status is ok from get" << std::endl;
-  }
-
   return replies;
 }
 void ClientForKeyValueStore::deletekey(const std::string &key) {
@@ -48,12 +38,6 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
 
   ClientContext context;
   Status status = stub_->deletekey(&context, request, &reply);
-  if (status.ok()) {
-    // std::cout << "status is ok" << std::endl;
-  } else {
-    std::cout << "Problem with put function of service layer"<<std::endl;
-  }
-
 }
 /*
     Implementing Functionalities for ServerForCommandLineClient
@@ -61,8 +45,8 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
 ServerForCommandLineClient::ServerForCommandLineClient() {
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
   std::vector <std::string> fromget = clientKey.get("chirps_");
-  if (fromget.size() != 0) {
-    chirps_ = std::stoi(fromget[0]);
+  if (fromget.size() == 0) {
+    clientKey.put("chirps_", std::to_string(0));
   }
 }
 Status ServerForCommandLineClient::registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response) {
@@ -79,7 +63,6 @@ Status ServerForCommandLineClient::registeruser(ServerContext* context, const Re
     chirp::User userValue;
     userValue.set_username(request->username()); 
     userValue.SerializeToString(&value);
-    printall(userValue);
   }
   clientKey.put(request->username(), value);
   return Status::OK;
@@ -131,8 +114,6 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
   std::string nextChirpID;
   {
     std::lock_guard<std::mutex> lock(mymutex_);
-    // ++chirps_;
-    // nextChirpID = std::to_string(chirps_);
     auto fromget = clientKey.get("chirps_");
     if (fromget.size() == 0) {
       nextChirpID = std::to_string(0);
@@ -153,7 +134,7 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
   user.ParseFromString(getValue);
   std::string userKey;
   
-  //Add new Chirp to User
+  //Add new Chirp to chirp::User
   std::string value; 
   {
     chirp::Chirp* message = user.add_chirps();
@@ -170,8 +151,8 @@ Status ServerForCommandLineClient::chirp(ServerContext* context, const ChirpRequ
   }
 
   user.SerializeToString(&userKey);
-  clientKey.put(request->username(),userKey); //Adds Chirp to User proto 
-  clientKey.put("chirp"+nextChirpID,value);//Add Chirp to backend
+  clientKey.put(request->username(),userKey); //Add Chirp to chirp::User
+  clientKey.put("chirp"+nextChirpID,value);//Add chirp::Chirp to database
   
   //If its a reply to an existing chirp
   if (request->parent_id() != "") { 
@@ -210,7 +191,7 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
   ClientForKeyValueStore clientKey(grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials()));
 
   std::vector <std::string> fromget = clientKey.get("chirp"+request->chirp_id());
-  std::vector <chirp::Chirp> chirpToSend;
+  std::vector <chirp::Chirp> chirpToSend; //For sorting by timestamp
   if (fromget.size() == 0) {
     return Status::CANCELLED;
   }
@@ -237,12 +218,10 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
     chirp::ChirpReplies chirpReplies = convertToChirpReplies(fromget[0]);
     for (int i = 0; i < chirpReplies.chirps_size(); i++) {
       myqueue.push(chirpReplies.chirps(i));
-      // chirp::Chirp* c = response->add_chirps();
-      // copyChirp(c, chirpReplies.chirps(i));
       chirpToSend.push_back(chirpReplies.chirps(i));
     }
   }
-  //sort by timestamp
+  //Sort by timestamp
   std::sort(chirpToSend.begin(), chirpToSend.end(), [](chirp::Chirp &a, chirp::Chirp &b){
     return a.timestamp().useconds() < b.timestamp().useconds();
   });
@@ -252,7 +231,6 @@ Status ServerForCommandLineClient::read(ServerContext* context, const ReadReques
     }
     chirp::Chirp* c = response->add_chirps();
     copyChirp(c, i);
-    std::cout << i.text() <<std::endl;
   }
   return Status::OK;
 }
@@ -281,6 +259,9 @@ Status ServerForCommandLineClient::monitor(ServerContext* context, const Monitor
     chirpsent. Keep looking for new chirps with this while loop.
   */
   while (true) {
+    if (context->IsCancelled()) {
+      break;
+    }
     for (int i = 0; i < followers.username_size(); i++) {
       auto allfollowers = clientKey.get(followers.username(i));
 
@@ -298,9 +279,7 @@ Status ServerForCommandLineClient::monitor(ServerContext* context, const Monitor
 
               chirp::Chirp* c = reply.mutable_chirp();
               copyChirp(c, userFollowers.chirps(j));
-              if (!writer->Write(reply)) {
-                return Status::CANCELLED;
-              }
+              writer->Write(reply);
               reply.clear_chirp();
             }
           
@@ -336,29 +315,6 @@ chirp::User ServerForCommandLineClient::stringToUser(std::string byte) {
   user.ParseFromString(byte);
 
   return user;
-}
-void ServerForCommandLineClient::printall(chirp::User user) {
-  std::cout << std::endl;
-  std::cout << user.username() <<std::endl;
-  std::cout << "size of followers :" << user.followers().username_size() <<std::endl;
-  for(int i=0; i< user.followers().username_size(); i++) {
-    std::cout << "following: "<< user.followers().username(i)<<std::endl;
-  }
-  std::cout << "size of chirps :" << user.chirps_size() <<std::endl;
-    for(int i=0; i< user.chirps_size(); i++) {
-    std::cout << "chirps: "<< user.chirps(i).text()<<std::endl;
-    std::cout << "reply to "<< user.chirps(i).parent_id() <<std::endl;
-  }
-  std::cout << std::endl;
-}
-void ServerForCommandLineClient::printallChirp(chirp::Chirp c) {
-  std::cout << std::endl;
-  std::cout << c.username() <<std::endl;
-  std::cout << c.text() <<std::endl;
-  std::cout << c.timestamp().seconds() << std::endl;
-  std::cout << c.timestamp().useconds() << std::endl;
-  std::cout << "ID:" <<c.id() <<std::endl;
-  std::cout << "parent id" <<c.parent_id() <<std::endl;
 }
 void ServerForCommandLineClient::setChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response) {
   chirp::Chirp* newChirp = response->mutable_chirp();

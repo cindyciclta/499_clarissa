@@ -58,7 +58,7 @@ class ClientFunctionalities {
   */
   void read(const std::string &chirp_id); 
   /*
-    read all the chirps that their followers chirped
+    Read all the chirps that their followers chirps in real-time
   */
   void monitor(const std::string &username); 
  private:

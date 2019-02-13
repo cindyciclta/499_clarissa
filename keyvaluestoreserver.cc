@@ -3,6 +3,7 @@
 Status KeyValueStoreServer::put(ServerContext* context, const PutRequest* request, PutReply* response) {
   std::lock_guard<std::mutex> lock(mymutex_);
   addkey(request->key(), request->value());
+  std::cout << "Sucessful: put()" <<std::endl;
   return Status::OK;
 }
 
@@ -13,22 +14,17 @@ Status KeyValueStoreServer::get(ServerContext* context, grpc::ServerReaderWriter
 
   while (stream->Read(&request)) {
     auto it = data_.find(request.key());
-    for(const auto &i :data_) {
-      std::cout << "key: "<< i.first <<std::endl;
-    }
     if (it != data_.end()) {
       GetReply reply;
       reply.set_value(it->second);
       found = true;
       stream->Write(reply);
-    } else {
-      std::cout << "Not Found Key"<<std::endl;
     }
   }
   if (!found) {
     return Status::CANCELLED;
   }
-  std:: cout << std::endl;
+  std::cout << "Sucessful: get()" <<std::endl;
   return Status::OK;
 }
 Status KeyValueStoreServer::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
@@ -36,6 +32,7 @@ Status KeyValueStoreServer::deletekey(ServerContext* context, const DeleteReques
   if (deletekeyhelper(request->key())) {
     return Status::OK;
   }
+  std::cout << "Sucessful: deletekey()" <<std::endl;
   return Status::CANCELLED;
 }
 bool KeyValueStoreServer::deletekeyhelper(const std::string &key) {

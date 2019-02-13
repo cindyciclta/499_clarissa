@@ -25,7 +25,8 @@ int main(int argc, char** argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
-  if (FLAGS_register != "") {
+  if (FLAGS_register != "" && FLAGS_user == "" && FLAGS_chirp == "" && 
+    FLAGS_reply == "" && FLAGS_follow == "" && FLAGS_read == "") {
     client.registeruser(FLAGS_register);
   } else if (FLAGS_user != "") {
     if (FLAGS_chirp != "" && FLAGS_reply == "") {
@@ -42,6 +43,8 @@ int main(int argc, char** argv) {
     if (FLAGS_monitor) {
       client.monitor(FLAGS_user);
     }
+  } else {
+    std::cout << "Syntax Error. Please try again." <<std::endl;
   }
   return  0;
 }

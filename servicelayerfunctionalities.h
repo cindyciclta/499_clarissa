@@ -13,7 +13,6 @@
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/client_context.h>
 #include "chirp.grpc.pb.h"
-#include <glog/logging.h>
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -131,13 +130,6 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
  private:
   /*
-    chirps_ is solely for chirp() to assign new chirp ids. This is initalize to 0 if the database
-    doees not have any chirps. If the database has existing chirps, this will be initalized to the
-    number of chirps that the database already holds. (The initalization happens in the constructor
-    of this class). Updating the chirp_ will be in chirp().
-  */
-  int chirps_ = 0; //Total umber of chirps 
-  /*
     Mutex to lock chirps_ to ensure there is no duplicated chirp id.
   */
   std::mutex mymutex_;
@@ -154,10 +146,6 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   */
   void copyChirp(chirp::Chirp* c, const chirp::Chirp &r); 
   /*
-    For debugging. 
-  */
-  void printall(chirp::User user);
-  /*
     Converts serialize string to chirp::User.
   */
   chirp::User stringToUser(std::string byte);
@@ -165,7 +153,7 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
     Copy chirp to ChirpReply's chirp.
   */
   void setChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
-  void printallChirp(chirp::Chirp c);
+
 };
 
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

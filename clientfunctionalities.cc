@@ -65,7 +65,7 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
     chirp::Chirp c = reply.chirps(i);
     std::time_t seconds = c.timestamp().seconds();
     // std::asctime(std::localtime(&seconds));
-    std::cout << "["<<c.username() << " " <<std::asctime(std::localtime(&seconds)) << "]: "<< c.text() << std::endl;
+    std::cout << "["<<c.username() << "]: "<< c.text() << std::endl;
   }
 
   if (status.ok()) {
@@ -76,6 +76,9 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
 
 }
 void ClientFunctionalities::monitor(const std::string &username) {
+    /* 
+    Tested: Able to recieve new chirps
+  */
   chirp::MonitorRequest request;
   request.set_username(username);
   chirp::MonitorReply reply;
