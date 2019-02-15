@@ -36,7 +36,8 @@ Run ./clientcommandline
 		$ echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
 	$ brew install hello
 	$ sudo apt-get install build-essential curl file git
-	https://github.com/grpc/grpc/blob/master/BUILDING.md
+	7. Install protobuf: https://github.com/grpc/grpc/blob/master/BUILDING.md
+		$ git clone https://github.com/protocolbuffers/protobuf.git
 		$ sudo apt-get install build-essential autoconf libtool pkg-config
 		$ sudo apt-get install libgflags-dev libgtest-dev
 		$ sudo apt-get update
@@ -46,7 +47,8 @@ Run ./clientcommandline
 		$ sudo apt-get install pkg-config
 
 		$ git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
-		inside grpc: 
+		
+		inside /vagrant/grpc: 
 		$ git submodule update --init
 		$ make
 		$ sudo make install
