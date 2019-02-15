@@ -63,7 +63,7 @@ class ClientFunctionalities {
   void monitor(const std::string &username); 
  private:
   /*
-    unsure what this does
+    Unique ptr for all the stub
   */
   std::unique_ptr<chirp::ServiceLayer::Stub> stub_; 
 };

@@ -60,16 +60,15 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
   Status status = stub_->read(&context, request, &reply);
 
   std::multimap <std::string,std::string> mymap;
-  std::cout << "size: "<< reply.chirps_size() <<std::endl;
+
   for (int i = 0; i < reply.chirps_size(); i++) {
     chirp::Chirp c = reply.chirps(i);
     std::time_t seconds = c.timestamp().seconds();
-    // std::asctime(std::localtime(&seconds));
     std::cout << "["<<c.username() << "]: "<< c.text() << std::endl;
   }
 
   if (status.ok()) {
-    // std::cout << "Successfully read all chirps with thread chirp"<< chirp_id << std::endl;
+    std::cout << "Successfully read all chirps with thread chirp"<< chirp_id << std::endl;
   } else {
     std::cout << status.error_code() << ": " << "Reading thread "<< chirp_id << " is unsuccessful."<< std::endl;
   }

@@ -63,7 +63,7 @@ class KeyValueStoreServer final : public KeyValueStore::Service {
   std::mutex mymutex_;
   /* 
     Helper function for put() function. It will replace the value with an existing key,
-    or put a new key in
+    or put a new key in.
   */
   void addkey(const std::string &key, const std::string &value);
   bool deletekeyhelper(const std::string &key);
