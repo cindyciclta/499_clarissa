@@ -40,27 +40,28 @@ class ClientFunctionalities {
   /*
     Constructor take takes in a shared pointer of Channel
   */
-  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) : stub_(chirp::ServiceLayer::NewStub(channel)) {}
+  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) 
+                                  : stub_(chirp::ServiceLayer::NewStub(channel)) {}
   /*
     Create a new user with username
   */
-  void registeruser(const std::string &username); 
+  void RegisterUser(const std::string &username); 
   /*
     Add a chirp to this username
   */
-  void chirp(const std::string &username, const std::string &text, const std::string &parent_id); 
+  void Chirp(const std::string &username, const std::string &text, const std::string &parent_id); 
   /*
     Follow a chirper with this username
   */
-  void follow(const std::string &username, const std::string &to_follow); 
+  void Follow(const std::string &username, const std::string &to_follow); 
   /*
     Read all the chirps from this user
   */
-  void read(const std::string &chirp_id); 
+  void Read(const std::string &chirp_id); 
   /*
     Read all the chirps that their followers chirps in real-time
   */
-  void monitor(const std::string &username); 
+  void Monitor(const std::string &username); 
  private:
   /*
     Unique ptr for all the stub

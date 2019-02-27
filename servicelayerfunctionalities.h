@@ -63,16 +63,16 @@ class ClientForKeyValueStore {
     Calls by ServerForCommandLineClient, recieving a string key and a serialized proto message value as a string.
     This function calls the put() in the keyvaluestoreserver.h/.cc
   */
-  void put(const std::string &key, const std::string &value); 
+  void Put(const std::string &key, const std::string &value); 
   /*
     Calls by ServerForCommandLineClient, recieving a string key. Returns a vector of all the data related 
     to the key in a vector. If the vector has a size 0, that means there is no key in the database (keyvaluestore.h/.cc).
   */
-  std::vector<std::string> get(const std::string &key);
+  std::vector<std::string> Get(const std::string &key);
   /*
     Calls by ServerForCommandLineClient, recieving a string key. Deletes the key in the database if exists.
   */
-  void deletekey(const std::string &key); 
+  void DeleteKey(const std::string &key); 
   
  private:
   std::unique_ptr<KeyValueStore::Stub> stub_;
@@ -98,21 +98,21 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
     "{username}" is the key, chirp::User is the value. RegisterReply doesn't reply anything because
     success/failure is signaled via GRPC status.
   */
-  Status registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response);
+  Status RegisterUser(ServerContext* context, const RegisterRequest* request, RegisterReply* response);
   /*
     chirp() takes in a ServerContext from the client that calls this function, as well as,
     ChirpRequest, and ChirpReply. chirp() will take the set values in ChirpRequest and 
     create a chirp::Chirp. This function will put the new chirp into the database
     "chirp<ID>" is the key, chirp::Chirp is the value. Returns the created chirp::Chirp in ChirpReply.
   */
-  Status chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response); 
+  Status Chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response); 
   /*
     follow() takes in a ServerContext the client that calls this function, as well as,
     FollowRequest, and FollowReply. follow() will take a request via FollowRequest, finds the
     username in the database, add a new follower to the username if exists. Updates the username's
     follower list. FollowReply doesn't reply anything success/failure is signaled via GRPC status. 
   */
-  Status follow(ServerContext* context, const FollowRequest* request, FollowReply* response); 
+  Status Follow(ServerContext* context, const FollowRequest* request, FollowReply* response); 
   /*
     read() takes in a ServerContext the client that calls this function, as well as, 
     ReadRequest and ReadReply. ReadRequest provides a chirp_id. read() will cal lthe get() 
@@ -120,14 +120,14 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
     as any chirps that replied to that chirp_id, and onwards. read() does a DFS and returns
     a list of chirps in ReadReply.
   */
-  Status read(ServerContext* context, const ReadRequest* request, ReadReply* response); 
+  Status Read(ServerContext* context, const ReadRequest* request, ReadReply* response); 
   /*
     monitor takes in a ServerContext the client that calls this function, as well as, 
     MonitorRequest, and ::grpc::ServerWriter<::chirp::MonitorReply>. MonitorRequest will
     allow monitor() to find the specific username in the database. If found, monitor will 
     endlessly sends all the chirps from anyone the user follows, and sends new chirps in real-time.
   */
-  Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
+  Status Monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
  private:
   /*
     Mutex to lock chirps_ to ensure there is no duplicated chirp id.
@@ -136,23 +136,23 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   /*
     Converts serialized string to chirp::Chirp
   */
-  chirp::Chirp convertToChirp(std::string byte); 
+  chirp::Chirp ConvertToChirp(std::string byte); 
   /*
     Converts serialized string to chirp::ChirpReplies (which is a list of replies to the same chirp<ID>)
   */
-  chirp::ChirpReplies convertToChirpReplies(std::string byte);
+  chirp::ChirpReplies ConvertToChirpReplies(std::string byte);
   /*
     Copy chirps
   */
-  void copyChirp(chirp::Chirp* c, const chirp::Chirp &r); 
+  void CopyChirp(chirp::Chirp* chirp, const chirp::Chirp &reply_chirp);
   /*
     Converts serialize string to chirp::User.
   */
-  chirp::User stringToUser(std::string byte);
+  chirp::User StringToUser(std::string byte);
   /*
     Copy chirp to ChirpReply's chirp.
   */
-  void setChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
+  void SetChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
 
 };
 

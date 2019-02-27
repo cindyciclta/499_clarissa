@@ -1,13 +1,13 @@
 #include "keyvaluestoreserver.h"
 
-Status KeyValueStoreServer::put(ServerContext* context, const PutRequest* request, PutReply* response) {
+Status KeyValueStoreServer::Put(ServerContext* context, const PutRequest* request, PutReply* response) {
   std::lock_guard<std::mutex> lock(mymutex_);
-  addkey(request->key(), request->value());
+  AddKey(request->key(), request->value());
   std::cout << "Sucessful: put()" <<std::endl;
   return Status::OK;
 }
 
-Status KeyValueStoreServer::get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
+Status KeyValueStoreServer::Get(ServerContext* context, grpc::ServerReaderWriter< GetReply, GetRequest>* stream) {
   std::lock_guard<std::mutex> lock(mymutex_);
   GetRequest request;
   bool found = false;
@@ -27,15 +27,17 @@ Status KeyValueStoreServer::get(ServerContext* context, grpc::ServerReaderWriter
   std::cout << "Sucessful: get()" <<std::endl;
   return Status::OK;
 }
-Status KeyValueStoreServer::deletekey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
+
+Status KeyValueStoreServer::DeleteKey(ServerContext* context, const DeleteRequest* request, DeleteReply* response) {
   std::lock_guard<std::mutex> lock(mymutex_);
-  if (deletekeyhelper(request->key())) {
+  if (DeleteKeyHelper(request->key())) {
+    std::cout << "Sucessful: deletekey()" <<std::endl;
     return Status::OK;
   }
-  std::cout << "Sucessful: deletekey()" <<std::endl;
   return Status::CANCELLED;
 }
-bool KeyValueStoreServer::deletekeyhelper(const std::string &key) {
+
+bool KeyValueStoreServer::DeleteKeyHelper(const std::string &key) {
   auto it = data_.find(key);
   if(it != data_.end()) {
     data_.erase(it);
@@ -43,12 +45,12 @@ bool KeyValueStoreServer::deletekeyhelper(const std::string &key) {
   }
   return false;
 }
-void KeyValueStoreServer::addkey(const std::string &key, const std::string &value) {
+
+void KeyValueStoreServer::AddKey(const std::string &key, const std::string &value) {
   auto it = data_.find(key);
   if(it != data_.end()) {
     it->second = value;
   } else {
     data_.emplace(key, value);
   }
-   
 }
