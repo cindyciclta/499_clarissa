@@ -1,12 +1,11 @@
 #include "clientfunctionalities.h"
 
-void ClientFunctionalities::RegisterUser(const std::string &username) {
+void ClientFunctionalities::registeruser(const std::string &username) {
   if (username == "") {
     return;
   }
   chirp::RegisterRequest request;
   request.set_username(username);
-  
   chirp::RegisterReply reply;
         
   ClientContext context;
@@ -18,10 +17,7 @@ void ClientFunctionalities::RegisterUser(const std::string &username) {
     std::cout << status.error_code() << ": " << "Register user unsuccessful: "<< username<< std::endl;
   }
 }
-
-void ClientFunctionalities::Chirp(const std::string &username, 
-                                  const std::string &text, 
-                                  const std::string &parent_id) {
+void ClientFunctionalities::chirp(const std::string &username, const std::string &text, const std::string &parent_id) {
   chirp::ChirpRequest request;
   request.set_username(username);
   request.set_text(text);
@@ -36,14 +32,12 @@ void ClientFunctionalities::Chirp(const std::string &username,
   } else {
     std::cout << status.error_code() << ": " << "Chirp is unsuccessful. Try again."<< std::endl;
   }
-}
-
-void ClientFunctionalities::Follow(const std::string &username, const std::string &to_follow) {
   
+}
+void ClientFunctionalities::follow(const std::string &username, const std::string &to_follow) {
   chirp::FollowRequest request;
   request.set_username(username);
   request.set_to_follow(to_follow);
-  
   chirp::FollowReply reply;
         
   ClientContext context;
@@ -55,8 +49,7 @@ void ClientFunctionalities::Follow(const std::string &username, const std::strin
     std::cout << status.error_code() << ": " << "Following " << to_follow << " is unsuccessful" << std::endl;
   }
 }
-
-void ClientFunctionalities::Read(const std::string &chirp_id) {
+void ClientFunctionalities::read(const std::string &chirp_id) {
   /* 
     Tested: Able to recieve replied chirps from chirp_id!
   */
@@ -69,9 +62,9 @@ void ClientFunctionalities::Read(const std::string &chirp_id) {
   std::multimap <std::string,std::string> mymap;
 
   for (int i = 0; i < reply.chirps_size(); i++) {
-    chirp::Chirp curr_chirp = reply.chirps(i);
-    std::time_t seconds = curr_chirp.timestamp().seconds();
-    std::cout << "["<<curr_chirp.username() << "]: "<< curr_chirp.text() << std::endl;
+    chirp::Chirp c = reply.chirps(i);
+    std::time_t seconds = c.timestamp().seconds();
+    std::cout << "["<<c.username() << "]: "<< c.text() << std::endl;
   }
 
   if (status.ok()) {
@@ -79,9 +72,9 @@ void ClientFunctionalities::Read(const std::string &chirp_id) {
   } else {
     std::cout << status.error_code() << ": " << "Reading thread "<< chirp_id << " is unsuccessful."<< std::endl;
   }
-}
 
-void ClientFunctionalities::Monitor(const std::string &username) {
+}
+void ClientFunctionalities::monitor(const std::string &username) {
     /* 
     Tested: Able to recieve new chirps
   */
@@ -96,4 +89,5 @@ void ClientFunctionalities::Monitor(const std::string &username) {
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
+
 }

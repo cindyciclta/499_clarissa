@@ -27,26 +27,26 @@ int main(int argc, char** argv) {
   ClientFunctionalities client(grpc::CreateChannel("localhost:50002", grpc::InsecureChannelCredentials()));
   if (FLAGS_register != "" && FLAGS_user == "" && FLAGS_chirp == "" && 
     FLAGS_reply == "" && FLAGS_follow == "" && FLAGS_read == "") {
-    client.RegisterUser(FLAGS_register);
+    client.registeruser(FLAGS_register);
   } else if (FLAGS_user != "") {
     if (FLAGS_chirp != "" && FLAGS_reply == "") {
-      client.Chirp(FLAGS_user, FLAGS_chirp, "");
+      client.chirp(FLAGS_user, FLAGS_chirp, "");
     } else if (FLAGS_chirp != "" && FLAGS_reply != "") {
-      client.Chirp(FLAGS_user, FLAGS_chirp, FLAGS_reply);
+      client.chirp(FLAGS_user, FLAGS_chirp, FLAGS_reply);
     }
     if (FLAGS_follow != "") {
-      client.Follow(FLAGS_user, FLAGS_follow);
+      client.follow(FLAGS_user, FLAGS_follow);
     }
     if (FLAGS_read != "") {
-      client.Read(FLAGS_read);
+      client.read(FLAGS_read);
     }
     if (FLAGS_monitor) {
-      client.Monitor(FLAGS_user);
+      client.monitor(FLAGS_user);
     }
   } else {
     std::cout << "Syntax Error. Please try again." <<std::endl;
   }
-  return 0;
+  return  0;
 }
 
 static bool ValidateUser(const char* flagname, const std::string &value) {

@@ -32,36 +32,35 @@ using chirp::MonitorReply;
 using chirp::ServiceLayer;
 using chirp::KeyValueStore;
 /**
-	ClientFunctionalities is a class that the Command Line Client will call when 
-	users are registering, sending a chirp, following other chirpers, and etc.
+  ClientFunctionalities is a class that the Command Line Client will call when 
+  users are registering, sending a chirp, following other chirpers, and etc.
 */
 class ClientFunctionalities {
  public:
   /*
     Constructor take takes in a shared pointer of Channel
   */
-  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) 
-                                  : stub_(chirp::ServiceLayer::NewStub(channel)) {}
+  explicit ClientFunctionalities(const std::shared_ptr<Channel> &channel) : stub_(chirp::ServiceLayer::NewStub(channel)) {}
   /*
     Create a new user with username
   */
-  void RegisterUser(const std::string &username); 
+  void registeruser(const std::string &username); 
   /*
     Add a chirp to this username
   */
-  void Chirp(const std::string &username, const std::string &text, const std::string &parent_id); 
+  void chirp(const std::string &username, const std::string &text, const std::string &parent_id); 
   /*
     Follow a chirper with this username
   */
-  void Follow(const std::string &username, const std::string &to_follow); 
+  void follow(const std::string &username, const std::string &to_follow); 
   /*
     Read all the chirps from this user
   */
-  void Read(const std::string &chirp_id); 
+  void read(const std::string &chirp_id); 
   /*
     Read all the chirps that their followers chirps in real-time
   */
-  void Monitor(const std::string &username); 
+  void monitor(const std::string &username); 
  private:
   /*
     Unique ptr for all the stub
