@@ -48,7 +48,7 @@ using namespace std::chrono;
 using time_stamp = std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds>;
 
 /*
-    ClientForKeyValueStore class is for the functionalities that the service layer will call when 
+    ClientForKeyValueStore class is for the functionalities that the service layer will call when
     it wants to add or get or delete things from the backend/key value store. AKA the Client to the
     backend (chirpimpl.h/.cc).
 */
@@ -63,23 +63,23 @@ class ClientForKeyValueStore {
     Calls by ServerForCommandLineClient, recieving a string key and a serialized proto message value as a string.
     This function calls the put() in the keyvaluestoreserver.h/.cc
   */
-  void put(const std::string &key, const std::string &value); 
+  void put(const std::string &key, const std::string &value);
   /*
-    Calls by ServerForCommandLineClient, recieving a string key. Returns a vector of all the data related 
+    Calls by ServerForCommandLineClient, recieving a string key. Returns a vector of all the data related
     to the key in a vector. If the vector has a size 0, that means there is no key in the database (keyvaluestore.h/.cc).
   */
   std::vector<std::string> get(const std::string &key);
   /*
     Calls by ServerForCommandLineClient, recieving a string key. Deletes the key in the database if exists.
   */
-  void deletekey(const std::string &key); 
-  
+  void deletekey(const std::string &key);
+
  private:
   std::unique_ptr<KeyValueStore::Stub> stub_;
 };
 
 /*
-    ServerForCommandLineClient class is for the functionalties that would be called from the ClientCommandLine client. 
+    ServerForCommandLineClient class is for the functionalties that would be called from the ClientCommandLine client.
     It will handle requests from the ClientCommandLine client and sends a response. AKA the Server to
     the command line client (clientcommandline.cc).
 */
@@ -101,33 +101,33 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   Status registeruser(ServerContext* context, const RegisterRequest* request, RegisterReply* response);
   /*
     chirp() takes in a ServerContext from the client that calls this function, as well as,
-    ChirpRequest, and ChirpReply. chirp() will take the set values in ChirpRequest and 
+    ChirpRequest, and ChirpReply. chirp() will take the set values in ChirpRequest and
     create a chirp::Chirp. This function will put the new chirp into the database
     "chirp<ID>" is the key, chirp::Chirp is the value. Returns the created chirp::Chirp in ChirpReply.
   */
-  Status chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response); 
+  Status chirp(ServerContext* context, const ChirpRequest* request, ChirpReply* response);
   /*
     follow() takes in a ServerContext the client that calls this function, as well as,
     FollowRequest, and FollowReply. follow() will take a request via FollowRequest, finds the
     username in the database, add a new follower to the username if exists. Updates the username's
-    follower list. FollowReply doesn't reply anything success/failure is signaled via GRPC status. 
+    follower list. FollowReply doesn't reply anything success/failure is signaled via GRPC status.
   */
-  Status follow(ServerContext* context, const FollowRequest* request, FollowReply* response); 
+  Status follow(ServerContext* context, const FollowRequest* request, FollowReply* response);
   /*
-    read() takes in a ServerContext the client that calls this function, as well as, 
-    ReadRequest and ReadReply. ReadRequest provides a chirp_id. read() will cal lthe get() 
-    function in ClientForKeyvalueStore and then retrieves the chirp with that id, as well 
+    read() takes in a ServerContext the client that calls this function, as well as,
+    ReadRequest and ReadReply. ReadRequest provides a chirp_id. read() will cal lthe get()
+    function in ClientForKeyvalueStore and then retrieves the chirp with that id, as well
     as any chirps that replied to that chirp_id, and onwards. read() does a DFS and returns
     a list of chirps in ReadReply.
   */
-  Status read(ServerContext* context, const ReadRequest* request, ReadReply* response); 
+  Status read(ServerContext* context, const ReadRequest* request, ReadReply* response);
   /*
-    monitor takes in a ServerContext the client that calls this function, as well as, 
+    monitor takes in a ServerContext the client that calls this function, as well as,
     MonitorRequest, and ::grpc::ServerWriter<::chirp::MonitorReply>. MonitorRequest will
-    allow monitor() to find the specific username in the database. If found, monitor will 
+    allow monitor() to find the specific username in the database. If found, monitor will
     endlessly sends all the chirps from anyone the user follows, and sends new chirps in real-time.
   */
-  Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer); 
+  Status monitor(ServerContext* context, const MonitorRequest* request, ::grpc::ServerWriter<::chirp::MonitorReply>* writer);
  private:
   /*
     Mutex to lock chirps_ to ensure there is no duplicated chirp id.
@@ -136,23 +136,23 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   /*
     Converts serialized string to chirp::Chirp
   */
-  chirp::Chirp convertToChirp(std::string byte); 
+  chirp::Chirp ConvertToChirp(std::string byte);
   /*
     Converts serialized string to chirp::ChirpReplies (which is a list of replies to the same chirp<ID>)
   */
-  chirp::ChirpReplies convertToChirpReplies(std::string byte);
+  chirp::ChirpReplies ConvertToChirpReplies(std::string byte);
   /*
     Copy chirps
   */
-  void copyChirp(chirp::Chirp* c, const chirp::Chirp &r); 
+  void CopyChirp(chirp::Chirp* c, const chirp::Chirp &r);
   /*
     Converts serialize string to chirp::User.
   */
-  chirp::User stringToUser(std::string byte);
+  chirp::User StringToUser(std::string byte);
   /*
     Copy chirp to ChirpReply's chirp.
   */
-  void setChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
+  void SetChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
 
 };
 

@@ -71,6 +71,22 @@ TEST(ToFollow, SimpleTest) {
   EXPECT_EQ(user_.followers().username(0), "user1");
 }
 /*
+  Follow a user that doesn't exist
+*/
+TEST(ToFollow, UserDoesntExistTest) {
+  KeyValueStoreInstance kvstore;
+  ServiceLayerInstance s_layer(&kvstore);
+  s_layer.RegisterUser("user1");
+
+  auto uservalue = kvstore.Get("user1");
+  chirp::User user_ = s_layer.StringToUser(uservalue[0]);
+  EXPECT_EQ(user_.username(),"user1");
+
+  bool result = s_layer.Follow("user1", "userdoesntexist");
+
+  EXPECT_EQ(false, result);
+}
+/*
   Following the same user twice should not add duplicates
 */
 TEST(ToFollow, FollowSameUserTwice) {

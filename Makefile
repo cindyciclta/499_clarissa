@@ -2,7 +2,7 @@ HOST_SYSTEM = $(shell uname | cut -f 1 -d_)
 SYSTEM ?= $(HOST_SYSTEM)
 CXX = g++
 CPPFLAGS += `pkg-config --cflags protobuf grpc`
-CXXFLAGS += -std=c++11 
+CXXFLAGS += -std=c++11
 ifeq ($(SYSTEM),Darwin)
 LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
            -lgrpc++_reflection\
@@ -14,7 +14,7 @@ LDFLAGS += -L/usr/local/lib `pkg-config --libs protobuf grpc++ grpc`\
 endif
 PROTOC = protoc
 GRPC_CPP_PLUGIN = grpc_cpp_plugin
-GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)` 
+GRPC_CPP_PLUGIN_PATH ?= `which $(GRPC_CPP_PLUGIN)`
 
 PROTOS_PATH = *.proto
 
@@ -26,14 +26,14 @@ backend: chirp.pb.o chirp.grpc.pb.o backend.o keyvaluestoreserver.cc keyvaluesto
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags 
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags
 
 servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest 
 test: chirp.pb.o chirp.grpc.pb.o test.o clientfunctionalities.o clientfunctionalities.h servicelayerfunctionalities.o servicelayerfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest 
+	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-keyvaluestoreinstance: keyvaluestoreinstance.o keyvaluestoreinstance.h keyvaluestorevirtual.h 
+keyvaluestoreinstance: keyvaluestoreinstance.o keyvaluestoreinstance.h keyvaluestorevirtual.h
 	g++ -std=c++11 -c -o keyvaluestoreinstance.o keyvaluestoreinstance.cc
 
 keyvaluestoretest: keyvaluestoretest.o keyvaluestoreinstance.o keyvaluestoreinstance.h

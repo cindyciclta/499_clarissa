@@ -111,6 +111,10 @@ bool ServiceLayerInstance::Follow(const std::string &username, const std::string
 		if (fromget.size() == 0) {
 			return false;
 		}
+		std::vector <std::string> follow_exist = kvstore->Get(tofollow);
+		if (follow_exist.size() == 0) {
+			return false;
+		}
 		std::string getKey = fromget[0];
 		user.ParseFromString(getKey);
 		chirp::Followers* f = user.mutable_followers();
