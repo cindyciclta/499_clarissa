@@ -155,5 +155,4 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   void SetChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
 
 };
-
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

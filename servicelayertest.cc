@@ -1,10 +1,10 @@
 #include <thread>
 
-#include <gtest/gtest.h>
 #include "chirp.grpc.pb.h"
+#include <gtest/gtest.h>
 
-#include "servicelayerinstance.h"
 #include "keyvaluestoreinstance.h"
+#include "servicelayerinstance.h"
 /*
   Add a single user
 */
@@ -15,7 +15,7 @@ TEST(RegisterUser, SimpleTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 }
 /*
   Add existing username
@@ -27,7 +27,7 @@ TEST(RegisterUser, DuplicatedUserTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   bool success = s_layer.RegisterUser("user1");
   EXPECT_EQ(false, success);
@@ -43,11 +43,11 @@ TEST(RegisterUser, MulipleUserTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   uservalue = kvstore.Get("user2");
   user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user2");
+  EXPECT_EQ(user_.username(), "user2");
 }
 /*
   Follow a single user
@@ -60,13 +60,13 @@ TEST(ToFollow, SimpleTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   s_layer.Follow("user2", "user1");
 
   uservalue = kvstore.Get("user2");
   user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user2");
+  EXPECT_EQ(user_.username(), "user2");
   EXPECT_EQ(user_.followers().username_size(), 1);
   EXPECT_EQ(user_.followers().username(0), "user1");
 }
@@ -80,7 +80,7 @@ TEST(ToFollow, UserDoesntExistTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   bool result = s_layer.Follow("user1", "userdoesntexist");
 
@@ -97,14 +97,14 @@ TEST(ToFollow, FollowSameUserTwice) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   s_layer.Follow("user2", "user1");
   s_layer.Follow("user2", "user1");
 
   uservalue = kvstore.Get("user2");
   user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user2");
+  EXPECT_EQ(user_.username(), "user2");
   EXPECT_EQ(user_.followers().username_size(), 1);
   EXPECT_EQ(user_.followers().username(0), "user1");
 }
@@ -119,14 +119,14 @@ TEST(ToFollow, MultipleUsers) {
   s_layer.RegisterUser("user3");
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   s_layer.Follow("user2", "user1");
   s_layer.Follow("user2", "user3");
 
   uservalue = kvstore.Get("user2");
   user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user2");
+  EXPECT_EQ(user_.username(), "user2");
   EXPECT_EQ(user_.followers().username_size(), 2);
   EXPECT_EQ(user_.followers().username(0), "user1");
   EXPECT_EQ(user_.followers().username(1), "user3");
@@ -141,9 +141,9 @@ TEST(ChirpTest, SimpleTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
-  chirp::ChirpReply* chirp_reply;
+  chirp::ChirpReply *chirp_reply;
   s_layer.Chirp("user1", "testing this chirp", "");
 
   auto from_get = kvstore.Get("chirp1");
@@ -161,9 +161,9 @@ TEST(ChirpTest, MultipleChirps) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
-  chirp::ChirpReply* chirp_reply;
+  chirp::ChirpReply *chirp_reply;
   s_layer.Chirp("user1", "testing this chirp", "");
   s_layer.Chirp("user1", "second chirp test", "1");
 
@@ -187,9 +187,9 @@ TEST(ReadTest, SimpleTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
-  chirp::ChirpReply* chirp_reply;
+  chirp::ChirpReply *chirp_reply;
   s_layer.Chirp("user1", "testing this chirp", "");
   s_layer.Chirp("user1", "second chirp test", "1");
   s_layer.Chirp("user1", "replying to thread", "1");
@@ -210,7 +210,7 @@ TEST(ReadTest, NullTest) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
   auto vector_of_chirps = s_layer.Read("1");
   EXPECT_EQ(0, vector_of_chirps.size());
@@ -225,9 +225,9 @@ TEST(ReadTest, MultipleThreads) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
-  chirp::ChirpReply* chirp_reply;
+  chirp::ChirpReply *chirp_reply;
   s_layer.Chirp("user1", "testing this chirp", "");
   s_layer.Chirp("user1", "second chirp test", "1");
   s_layer.Chirp("user1", "replying to thread", "1");
@@ -255,9 +255,9 @@ TEST(ReadTest, ComplexThreads) {
 
   auto uservalue = kvstore.Get("user1");
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
-  EXPECT_EQ(user_.username(),"user1");
+  EXPECT_EQ(user_.username(), "user1");
 
-  chirp::ChirpReply* chirp_reply;
+  chirp::ChirpReply *chirp_reply;
   s_layer.Chirp("user1", "testing this chirp", "");
   s_layer.Chirp("user1", "second chirp test", "1");
   s_layer.Chirp("user1", "replying to thread", "1");
@@ -281,7 +281,7 @@ void RunMonitorAutomaticChirpGenerator(KeyValueStoreInstance *kv) {
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   ServiceLayerInstance s_layer(kv);
   for (int i = 0; i < 10; i++) {
-    s_layer.Chirp("user2", "chirping "+std::to_string(i), "");
+    s_layer.Chirp("user2", "chirping " + std::to_string(i), "");
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
@@ -289,7 +289,7 @@ void RunMonitorAutomaticChirpGenerator(KeyValueStoreInstance *kv) {
   Monitor test: create another thread that acts as a user chirping
 */
 TEST(MonitorTest, SimpleTest) {
-  KeyValueStoreInstance* kvstore = new KeyValueStoreInstance;
+  KeyValueStoreInstance *kvstore = new KeyValueStoreInstance;
   ServiceLayerInstance s_layer(kvstore);
   s_layer.RegisterUser("user1");
   s_layer.RegisterUser("user2");
@@ -298,12 +298,9 @@ TEST(MonitorTest, SimpleTest) {
   auto recieved_monitor_chirp = s_layer.Monitor("user1");
   second.join();
   EXPECT_NE(0, recieved_monitor_chirp.size());
-  // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-
 }
 
-
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }

@@ -47,8 +47,8 @@ Run ./clientcommandline
 		$ sudo apt-get install pkg-config
 
 		$ git clone -b $(curl -L https://grpc.io/release) https://github.com/grpc/grpc
-		
-		inside /vagrant/grpc: 
+
+		inside /vagrant/grpc:
 		$ git submodule update --init
 		$ make
 		$ sudo make install
@@ -72,7 +72,7 @@ Run ./clientcommandline
 
 3. complication instructions
 	In 'project', type 'make' to compile.
-	Then, ./backend for key value store 
+	Then, ./backend for key value store
 	./servicelayer for the serveice layer
 	./clientcommandline for client commandline
 
@@ -87,6 +87,6 @@ Run ./clientcommandline
 		{Succesfully chirped with id: <id>}
 
 	./clientcommandline --register damian
-		{Registered user: damian}	
+		{Registered user: damian}
 	./clientcommandline --register cat --chirp "is it going to work?"
 		{Syntax Error. Please try again.}
