@@ -27,7 +27,7 @@ void ClientFunctionalities::chirp(const std::string &username,
   request.set_parent_id(parent_id);
 
   chirp::ChirpReply reply;
-  s ClientContext context;
+  ClientContext context;
   Status status = stub_->chirp(&context, request, &reply);
 
   if (status.ok()) {
@@ -97,6 +97,8 @@ void ClientFunctionalities::monitor(const std::string &username) {
       std::cout << "[" << reply.chirp().username()
                 << "]: " << reply.chirp().text() << std::endl;
     }
+    /* Polls for every half a second so that it doesn't have to keep polling too
+     * many times */
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }

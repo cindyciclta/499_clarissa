@@ -203,9 +203,9 @@ ServiceLayerInstance::Monitor(const std::string &username) {
   chirp::MonitorReply reply;
   chirp::Followers followers = user.followers();
   /*
-          Continuously look through all user's followers, and their chirps. Keep
-     all sent chirps in a set called chirpsent. Keep looking for new chirps with
-     this while loop.
+    Continuously look through all user's followers, and their chirps. Keep
+    all sent chirps in a set called chirpsent. Keep looking for new chirps with
+    this while loop.
   */
   int k = 0;
   while (k < 10) {
@@ -242,9 +242,9 @@ void ServiceLayerInstance::CopyChirp(chirp::Chirp *chirp_,
   chirp_->set_text(reply_.text());
   chirp_->set_id(reply_.id());
   chirp_->set_parent_id(reply_.parent_id());
-  chirp::Timestamp *t = chirp_->mutable_timestamp();
-  t->set_seconds(reply_.timestamp().seconds());
-  t->set_useconds(reply_.timestamp().useconds());
+  chirp::Timestamp *time = chirp_->mutable_timestamp();
+  time->set_seconds(reply_.timestamp().seconds());
+  time->set_useconds(reply_.timestamp().useconds());
 }
 chirp::Chirp ServiceLayerInstance::ConvertToChirp(std::string byte) {
   chirp::Chirp chirp_;
@@ -265,12 +265,12 @@ chirp::User ServiceLayerInstance::StringToUser(std::string byte) {
 }
 void ServiceLayerInstance::SetChirpReply(chirp::Chirp *chirp,
                                          chirp::ChirpReply *response) {
-  chirp::Chirp *newChirp = response->mutable_chirp();
-  newChirp->set_username(chirp->username());
-  newChirp->set_text(chirp->text());
-  newChirp->set_id(chirp->id());
-  newChirp->set_parent_id(chirp->parent_id());
-  chirp::Timestamp *timestamp = newChirp->mutable_timestamp();
+  chirp::Chirp *new_chirp = response->mutable_chirp();
+  new_chirp->set_username(chirp->username());
+  new_chirp->set_text(chirp->text());
+  new_chirp->set_id(chirp->id());
+  new_chirp->set_parent_id(chirp->parent_id());
+  chirp::Timestamp *timestamp = new_chirp->mutable_timestamp();
   timestamp->set_seconds(chirp->timestamp().seconds());
   timestamp->set_useconds(chirp->timestamp().useconds());
 }

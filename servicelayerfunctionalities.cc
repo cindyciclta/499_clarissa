@@ -48,6 +48,7 @@ void ClientForKeyValueStore::deletekey(const std::string &key) {
 ServerForCommandLineClient::ServerForCommandLineClient() {
   ClientForKeyValueStore client_key(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
+  /* This is to preset the number of chirps for the chirp ID. "chirps_" */
   std::vector<std::string> from_get = client_key.get("chirps_");
   if (from_get.size() == 0) {
     client_key.put("chirps_", std::to_string(0));
@@ -66,13 +67,13 @@ Status ServerForCommandLineClient::registeruser(ServerContext *context,
   if (from_get_function.size() != 0) {
     return Status::CANCELLED;
   }
-  std::string value;
+  std::string string_to_user_proto;
   {
-    chirp::User userValue;
-    userValue.set_username(request->username());
-    userValue.SerializeToString(&value);
+    chirp::User user_proto;
+    user_proto.set_username(request->username());
+    user_proto.SerializeToString(&string_to_user_proto);
   }
-  client_key.put(request->username(), value);
+  client_key.put(request->username(), string_to_user_proto);
   return Status::OK;
 }
 
@@ -81,7 +82,6 @@ Status ServerForCommandLineClient::follow(ServerContext *context,
                                           FollowReply *response) {
   ClientForKeyValueStore client_key(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
-
   /*
     Tested: Able to add followers to user with an empty followers list and if
     there exist a followers list
@@ -90,7 +90,7 @@ Status ServerForCommandLineClient::follow(ServerContext *context,
     return Status::CANCELLED;
   }
 
-  std::string value;
+  std::string string_to_user_proto;
   {
     chirp::User user;
     std::vector<std::string> from_get_function =
@@ -105,8 +105,8 @@ Status ServerForCommandLineClient::follow(ServerContext *context,
       return Status::CANCELLED;
     }
 
-    std::string getKey = from_get_function[0];
-    user.ParseFromString(getKey);
+    std::string string_username = from_get_function[0];
+    user.ParseFromString(string_username);
     chirp::Followers *f = user.mutable_followers();
     for (int i = 0; i < f->username_size(); i++) {
       if (f->username(i) == request->to_follow()) {
@@ -114,10 +114,10 @@ Status ServerForCommandLineClient::follow(ServerContext *context,
       }
     }
     f->add_username(request->to_follow());
-    user.SerializeToString(&value);
+    user.SerializeToString(&string_to_user_proto);
   }
 
-  client_key.put(request->username(), value);
+  client_key.put(request->username(), string_to_user_proto);
   return Status::OK;
 }
 
@@ -131,25 +131,12 @@ Status ServerForCommandLineClient::chirp(ServerContext *context,
     value
   */
   /* Get TimeStamp */
-  std::time_t seconds = std::time(nullptr);
-  int64_t microseconds_since_epoch =
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          std::chrono::system_clock::now().time_since_epoch())
-          .count();
+  std::time_t seconds;
+  int64_t microseconds_since_epoch;
+  SetTimeStamp(seconds, microseconds_since_epoch);
 
-  /* Get next chirp id, and lock it!*/
-  std::string next_chirp_ID;
-  {
-    std::lock_guard<std::mutex> lock(mymutex_);
-    auto from_get_function = client_key.get("chirps_");
-    if (from_get_function.size() == 0) {
-      next_chirp_ID = std::to_string(0);
-    } else {
-      int currchirpid = std::stoi(from_get_function[0]);
-      currchirpid++;
-      next_chirp_ID = std::to_string(currchirpid);
-    }
-    client_key.put("chirps_", next_chirp_ID);
+  if (!CheckIfReplyIDExist(client_key, request)) {
+    return Status::CANCELLED;
   }
   /*Get User*/
   chirp::User user;
@@ -158,14 +145,18 @@ Status ServerForCommandLineClient::chirp(ServerContext *context,
   if (from_get_function.size() == 0) {
     return Status::CANCELLED;
   }
+  /* Get next chirp id*/
+  std::string next_chirp_ID = GetNextChirpID(client_key);
+  client_key.put("chirps_", next_chirp_ID);
+
   std::string getValue = from_get_function[0];
   user.ParseFromString(getValue);
-  std::string userKey;
 
+  chirp::Chirp *message;
   /*Add new Chirp to chirp::User*/
-  std::string value;
+  std::string create_chirp_to_proto;
   {
-    chirp::Chirp *message = user.add_chirps();
+    message = user.add_chirps();
     message->set_username(request->username());
     message->set_text(request->text());
     message->set_id(next_chirp_ID);
@@ -173,48 +164,38 @@ Status ServerForCommandLineClient::chirp(ServerContext *context,
     timestamp->set_seconds(static_cast<int64_t>(seconds));
     timestamp->set_useconds(microseconds_since_epoch);
     message->set_parent_id(request->parent_id());
-    message->SerializeToString(&value);
+    message->SerializeToString(&create_chirp_to_proto);
 
     SetChirpReply(message, response);
   }
-
-  user.SerializeToString(&userKey);
-  client_key.put(request->username(), userKey); /* Add Chirp to chirp::User */
+  /* Save new chirp & User with new chirp back to database */
+  std::string string_user_to_proto;
+  user.SerializeToString(&string_user_to_proto);
+  client_key.put(request->username(),
+                 string_user_to_proto); /* Add Chirp to chirp::User */
   client_key.put("chirp" + next_chirp_ID,
-                 value); /* Add chirp::Chirp to database */
+                 create_chirp_to_proto); /* Add chirp::Chirp to database */
 
   /* If its a reply to an existing chirp */
   if (request->parent_id() != "") {
-    std::string value2;
+    std::string reply_chirp_to_proto;
     {
       std::vector<std::string> from_get_function =
           client_key.get("reply" + request->parent_id());
 
       chirp::ChirpReplies replies;
-
-      /*
-        If chirp id is not found, use the 'replies' as a new ChirpReplies and
-        set parent_id()
-      */
       if (from_get_function.size() == 0) {
         replies.set_parent_id(request->parent_id());
       } else { /* If found, parse from existing ChirpReplies */
         replies.ParseFromString(from_get_function[0]);
       }
       chirp::Chirp *reply = replies.add_chirps();
-      reply->set_username(request->username());
-      reply->set_text(request->text());
-      reply->set_id(next_chirp_ID);
-      reply->set_parent_id(request->parent_id());
-      chirp::Timestamp *timestamp = reply->mutable_timestamp();
-      timestamp->set_seconds(static_cast<int64_t>(seconds));
-      timestamp->set_useconds(microseconds_since_epoch);
-      replies.SerializeToString(&value2);
+      CopyChirp(reply, *message);
+      replies.SerializeToString(&reply_chirp_to_proto);
     }
     client_key.put("reply" + request->parent_id(),
-                   value2); // Add reply<ID> to backend
+                   reply_chirp_to_proto); /* Add reply<ID> to backend */
   }
-
   return Status::OK;
 }
 
@@ -234,34 +215,34 @@ Status ServerForCommandLineClient::read(ServerContext *context,
   if (from_get_function.size() == 0) {
     return Status::CANCELLED;
   }
-  std::string mainChirpMsg = from_get_function[0];
+  std::string main_chirp_msg = from_get_function[0];
 
-  chirp::Chirp *mainChirp = response->add_chirps();
-  mainChirp->ParseFromString(mainChirpMsg);
-  chirpToSend.push_back(*mainChirp);
+  chirp::Chirp *main_chirp = response->add_chirps();
+  main_chirp->ParseFromString(main_chirp_msg);
+  chirpToSend.push_back(*main_chirp);
 
   std::queue<chirp::Chirp> myqueue;
-  myqueue.push(*mainChirp);
+  myqueue.push(*main_chirp);
 
   /*
     Running DFS to get threads related to chirp<id>
   */
   while (!myqueue.empty()) {
-    chirp::Chirp currentChirp = myqueue.front();
+    chirp::Chirp current_chirp = myqueue.front();
     myqueue.pop();
     /*
-      Find other chirps that are in reply to this currentChirp
+      Find other chirps that are in reply to this current_chirp
     */
-    from_get_function = client_key.get("reply" + currentChirp.id());
+    from_get_function = client_key.get("reply" + current_chirp.id());
     if (from_get_function.size() == 0) {
       continue;
     }
 
-    chirp::ChirpReplies chirpReplies =
+    chirp::ChirpReplies chirp_replies =
         ConvertToChirpReplies(from_get_function[0]);
-    for (int i = 0; i < chirpReplies.chirps_size(); i++) {
-      myqueue.push(chirpReplies.chirps(i));
-      chirpToSend.push_back(chirpReplies.chirps(i));
+    for (int i = 0; i < chirp_replies.chirps_size(); i++) {
+      myqueue.push(chirp_replies.chirps(i));
+      chirpToSend.push_back(chirp_replies.chirps(i));
     }
   }
   /*
@@ -272,7 +253,7 @@ Status ServerForCommandLineClient::read(ServerContext *context,
               return a.timestamp().useconds() < b.timestamp().useconds();
             });
   for (const auto &i : chirpToSend) {
-    if (i.id() == mainChirp->id()) {
+    if (i.id() == main_chirp->id()) {
       continue;
     }
     chirp::Chirp *c = response->add_chirps();
@@ -284,13 +265,10 @@ Status ServerForCommandLineClient::read(ServerContext *context,
 Status ServerForCommandLineClient::monitor(
     ServerContext *context, const MonitorRequest *request,
     ::grpc::ServerWriter<::chirp::MonitorReply> *writer) {
-  // Get Current TimeStamp
-  std::time_t seconds = std::time(nullptr);
-  int64_t seconds_since_epoch = static_cast<int64_t>(seconds);
-  int64_t microseconds_since_epoch =
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          std::chrono::system_clock::now().time_since_epoch())
-          .count();
+  /* Get Current TimeStamp */
+  std::time_t seconds;
+  int64_t microseconds_since_epoch;
+  SetTimeStamp(seconds, microseconds_since_epoch);
 
   ClientForKeyValueStore client_key(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
@@ -308,31 +286,33 @@ Status ServerForCommandLineClient::monitor(
   chirp::Followers followers = user.followers();
   /*
     Continuously look through all user's followers, and their chirps. Keep all
-    sent chirps in a set called chirpsent. Keep looking for new chirps with this
-    while loop.
+    sent chirps in a set called chirpsent to disallow sending duplicates. Keep
+    looking for new chirps with this while loop.
   */
   while (true) {
     if (context->IsCancelled()) {
       break;
     }
     for (int i = 0; i < followers.username_size(); i++) {
-      auto allfollowers = client_key.get(followers.username(i));
+      auto all_followers = client_key.get(followers.username(i));
 
-      if (allfollowers.size() > 0) {
-        chirp::User userFollowers;
-        std::string temp = allfollowers[0];
-        userFollowers.ParseFromString(temp);
-
-        for (int j = 0; j < userFollowers.chirps_size(); j++) {
-          auto it = chirpsent.find(userFollowers.chirps(j).id());
-
+      if (all_followers.size() > 0) {
+        chirp::User curr_follower;
+        std::string temp = all_followers[0];
+        curr_follower.ParseFromString(temp);
+        /* Loop through this User's follower's chirps */
+        for (int j = 0; j < curr_follower.chirps_size(); j++) {
+          auto it = chirpsent.find(curr_follower.chirps(j).id());
+          /* Find this User's follower's chirp's id in the set. If it's not in
+            the set, then its a new chirp */
           if (it == chirpsent.end()) {
-            if (userFollowers.chirps(j).timestamp().useconds() >
+            /* If this chirp is chirped after creating montior */
+            if (curr_follower.chirps(j).timestamp().useconds() >
                 microseconds_since_epoch) {
-              chirpsent.insert(userFollowers.chirps(j).id());
+              chirpsent.insert(curr_follower.chirps(j).id());
 
               chirp::Chirp *c = reply.mutable_chirp();
-              CopyChirp(c, userFollowers.chirps(j));
+              CopyChirp(c, curr_follower.chirps(j));
               writer->Write(reply);
               reply.clear_chirp();
             }
@@ -347,21 +327,21 @@ Status ServerForCommandLineClient::monitor(
 /*
   Below: Private Functions Implementations
 */
-void ServerForCommandLineClient::CopyChirp(chirp::Chirp *c,
-                                           const chirp::Chirp &r) {
-  c->set_username(r.username());
-  c->set_text(r.text());
-  c->set_id(r.id());
-  c->set_parent_id(r.parent_id());
-  chirp::Timestamp *t = c->mutable_timestamp();
-  t->set_seconds(r.timestamp().seconds());
-  t->set_useconds(r.timestamp().useconds());
+void ServerForCommandLineClient::CopyChirp(chirp::Chirp *chirp,
+                                           const chirp::Chirp &chirp_to_copy) {
+  chirp->set_username(chirp_to_copy.username());
+  chirp->set_text(chirp_to_copy.text());
+  chirp->set_id(chirp_to_copy.id());
+  chirp->set_parent_id(chirp_to_copy.parent_id());
+  chirp::Timestamp *time = chirp->mutable_timestamp();
+  time->set_seconds(chirp_to_copy.timestamp().seconds());
+  time->set_useconds(chirp_to_copy.timestamp().useconds());
 }
 
 chirp::Chirp ServerForCommandLineClient::ConvertToChirp(std::string byte) {
-  chirp::Chirp c;
-  c.ParseFromString(byte);
-  return c;
+  chirp::Chirp chirp;
+  chirp.ParseFromString(byte);
+  return chirp;
 }
 
 chirp::ChirpReplies
@@ -380,12 +360,46 @@ chirp::User ServerForCommandLineClient::StringToUser(std::string byte) {
 
 void ServerForCommandLineClient::SetChirpReply(chirp::Chirp *chirp,
                                                chirp::ChirpReply *response) {
-  chirp::Chirp *newChirp = response->mutable_chirp();
-  newChirp->set_username(chirp->username());
-  newChirp->set_text(chirp->text());
-  newChirp->set_id(chirp->id());
-  newChirp->set_parent_id(chirp->parent_id());
-  chirp::Timestamp *timestamp = newChirp->mutable_timestamp();
+  chirp::Chirp *new_chirp = response->mutable_chirp();
+  new_chirp->set_username(chirp->username());
+  new_chirp->set_text(chirp->text());
+  new_chirp->set_id(chirp->id());
+  new_chirp->set_parent_id(chirp->parent_id());
+  chirp::Timestamp *timestamp = new_chirp->mutable_timestamp();
   timestamp->set_seconds(chirp->timestamp().seconds());
   timestamp->set_useconds(chirp->timestamp().useconds());
+}
+
+std::string
+ServerForCommandLineClient::GetNextChirpID(ClientForKeyValueStore &client_key) {
+  auto from_get_function = client_key.get("chirps_");
+  std::string next_chirp_ID;
+  if (from_get_function.size() == 0) {
+    next_chirp_ID = std::to_string(0);
+  } else {
+    int curr_chirp_id = std::stoi(from_get_function[0]);
+    curr_chirp_id++;
+    next_chirp_ID = std::to_string(curr_chirp_id);
+  }
+  return next_chirp_ID;
+}
+
+void ServerForCommandLineClient::SetTimeStamp(
+    std::time_t &seconds, int64_t &microseconds_since_epoch) {
+  seconds = std::time(nullptr);
+  microseconds_since_epoch =
+      std::chrono::duration_cast<std::chrono::microseconds>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
+}
+
+bool ServerForCommandLineClient::CheckIfReplyIDExist(
+    ClientForKeyValueStore &client_key, const ChirpRequest *request) {
+  if (request->parent_id() != "") {
+    auto from_get_function = client_key.get("chirp" + request->parent_id());
+    if (from_get_function.size() == 0) {
+      return false;
+    }
+  }
+  return true;
 }

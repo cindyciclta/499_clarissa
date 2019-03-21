@@ -5,29 +5,7 @@
 
 #include "chirp.grpc.pb.h"
 #include "keyvaluestoreinstance.h"
-/*
-  UserObject is an object to store all users who registers. For testing purposes
-  only. Actual UserObject is using grpc protos. However, this resembles the
-  functionality of the proto object User.
-*/
-struct ChirpObject {
-  std::string chirpID_;
-  std::string parentID_;
-  std::string text_;
-  std::string username_;
-};
 
-struct ReplyObject {
-  std::string username_;
-  std::string parentID_;
-  std::vector<ChirpObject> replies_;
-};
-
-struct UserObject {
-  std::string username_;
-  std::vector<std::string> followers_;
-  std::vector<ChirpObject> chirps_;
-};
 /*
   This Class is to test the service layer functionalities. It does not
   go over GRPC. It uses KeyValueStoreInstance which is a key value store

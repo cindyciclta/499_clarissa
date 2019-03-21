@@ -30,7 +30,10 @@ int main(int argc, char **argv) {
       FLAGS_reply == "" && FLAGS_follow == "" && FLAGS_read == "") {
     client.registeruser(FLAGS_register);
   } else if (FLAGS_user != "") {
-    if (FLAGS_chirp != "" && FLAGS_reply == "") {
+    if (FLAGS_chirp == "" && FLAGS_reply == "" && FLAGS_follow == "" &&
+        FLAGS_read == "" && !FLAGS_monitor) {
+      std::cout << "No Commands. Try Again." << std::endl;
+    } else if (FLAGS_chirp != "" && FLAGS_reply == "") {
       client.chirp(FLAGS_user, FLAGS_chirp, "");
     } else if (FLAGS_chirp != "" && FLAGS_reply != "") {
       client.chirp(FLAGS_user, FLAGS_chirp, FLAGS_reply);

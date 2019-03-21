@@ -115,7 +115,7 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
   Status follow(ServerContext* context, const FollowRequest* request, FollowReply* response);
   /*
     read() takes in a ServerContext the client that calls this function, as well as,
-    ReadRequest and ReadReply. ReadRequest provides a chirp_id. read() will cal lthe get()
+    ReadRequest and ReadReply. ReadRequest provides a chirp_id. read() will call the get()
     function in ClientForKeyvalueStore and then retrieves the chirp with that id, as well
     as any chirps that replied to that chirp_id, and onwards. read() does a DFS and returns
     a list of chirps in ReadReply.
@@ -153,6 +153,19 @@ class ServerForCommandLineClient final : public ServiceLayer ::Service {
     Copy chirp to ChirpReply's chirp.
   */
   void SetChirpReply(chirp::Chirp* chirp, chirp::ChirpReply* response);
+  /*
+    Get the next chirp ID from backend
+  */
+  std::string GetNextChirpID(ClientForKeyValueStore &client_key);
+  /*
+    Set TimeStamp: takes in time_t and int64_t and sets the time accordingly
+  */
+  void SetTimeStamp(std::time_t &seconds, int64_t &microseconds_since_epoch);
+  /*
+    Check if the chirp that the user is replying to exist
+  */
+  bool CheckIfReplyIDExist(
+      ClientForKeyValueStore &client_key, const ChirpRequest *request);
 
 };
 #endif // SERVICE_LAYER_FUNCTIONALITIES_H_

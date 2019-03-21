@@ -1,7 +1,7 @@
-
 #include "keyvaluestoreserver.h"
 /*
-    RunServer() runs the backend server and recieves any requests from the Service Layer
+    RunServer() runs the backend server and recieves any requests from the
+   Service Layer
 */
 void RunServer() {
   std::string server_address("0.0.0.0:50000");
@@ -13,12 +13,12 @@ void RunServer() {
   builder.RegisterService(&service);
 
   std::unique_ptr<Server> server(builder.BuildAndStart());
-  std::cout << "Server listening on "<< server_address << std::endl;
+  std::cout << "Server listening on " << server_address << std::endl;
 
   server->Wait();
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   RunServer();
 
   return 0;
