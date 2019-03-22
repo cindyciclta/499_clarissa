@@ -14,6 +14,8 @@
 #include <grpcpp/client_context.h>
 #include "chirp.grpc.pb.h"
 
+#include "clientforkeyvaluestore.h"
+
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::Status;
@@ -48,42 +50,11 @@ using namespace std::chrono;
 using time_stamp = std::chrono::time_point<std::chrono::system_clock, std::chrono::microseconds>;
 
 /*
-    ClientForKeyValueStore class is for the functionalities that the service layer will call when
-    it wants to add or get or delete things from the backend/key value store. AKA the Client to the
-    backend (chirpimpl.h/.cc).
-*/
-class ClientForKeyValueStore {
- public:
-  /*
-    Constructor that takes in a shared_ptr of many grpc::CreateChannel("localhost:50000", grpc::InsecureChannelCredentials())
-    and initalizes the channel to stab_.
-  */
-  explicit ClientForKeyValueStore(std::shared_ptr<Channel> channel) :stub_(KeyValueStore::NewStub(channel)){}
-  /*
-    Calls by ServerForCommandLineClient, recieving a string key and a serialized proto message value as a string.
-    This function calls the put() in the keyvaluestoreserver.h/.cc
-  */
-  void put(const std::string &key, const std::string &value);
-  /*
-    Calls by ServerForCommandLineClient, recieving a string key. Returns a vector of all the data related
-    to the key in a vector. If the vector has a size 0, that means there is no key in the database (keyvaluestore.h/.cc).
-  */
-  std::vector<std::string> get(const std::string &key);
-  /*
-    Calls by ServerForCommandLineClient, recieving a string key. Deletes the key in the database if exists.
-  */
-  void deletekey(const std::string &key);
-
- private:
-  std::unique_ptr<KeyValueStore::Stub> stub_;
-};
-
-/*
     ServerForCommandLineClient class is for the functionalties that would be called from the ClientCommandLine client.
     It will handle requests from the ClientCommandLine client and sends a response. AKA the Server to
     the command line client (clientcommandline.cc).
 */
-class ServerForCommandLineClient final : public ServiceLayer ::Service {
+class ServerForCommandLineClient final : public ServiceLayer::Service {
  public:
   /*
     Constructor that will call get("chirp_") from ClientForkeyValueStore class. The purpose is to initalize

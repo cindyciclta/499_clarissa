@@ -7,22 +7,30 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-/* KeyValueStoreInstance class is solely for testing only. This is testing the
-   class in keyvaluestoreserver.cc
+/*
+  KeyValueStoreInstance class is solely for testing only. This is testing the
+  class in keyvaluestoreserver.cc.
 */
 class KeyValueStoreInstance {
 public:
-  KeyValueStoreInstance(){};  /* constructor */
-  ~KeyValueStoreInstance(){}; /* deconstructor */
-  /* Put() takes in a key and value and stores into kvstore */
+  KeyValueStoreInstance(){};  /* Constructor */
+  ~KeyValueStoreInstance(){}; /* Deconstructor */
+  /*
+    Put() takes in a key and value and stores into kvstore
+  */
   void Put(const std::string &key, const std::string &value);
-  /* Get() takes in a key a returns values to that key */
+  /*
+    Get() takes in a key a returns values to that key
+  */
   std::vector<std::string> Get(const std::string &key);
-  /* DeleteKey() takes in a key and returns true or false it was able to delete
-   * the key. */
+  /*
+    DeleteKey() takes in a key and returns true or false it was able to delete
+    the key.
+  */
   bool DeleteKey(const std::string &key);
-  /* To test the Put() without using Get() to validate, this function returns
-     the value from the private variable data_ that stores all data.
+  /*
+  To test the Put() without using Get() to validate, this function returns
+  the value from the private variable data_ that stores all data.
   */
   std::string GetFromMap(const std::string &key);
 

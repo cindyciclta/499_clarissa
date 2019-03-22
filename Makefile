@@ -20,7 +20,7 @@ PROTOS_PATH = *.proto
 
 vpath %.proto $(PROTOS_PATH)
 
-all: servicelayertest keyvaluestoreinstance keyvaluestoretest test backend clientcommandline servicelayer
+all: servicelayertest keyvaluestoreinstance keyvaluestoretest backend clientcommandline servicelayer
 
 backend: chirp.pb.o chirp.grpc.pb.o backend.o keyvaluestoreserver.cc keyvaluestoreserver.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
@@ -28,9 +28,7 @@ backend: chirp.pb.o chirp.grpc.pb.o backend.o keyvaluestoreserver.cc keyvaluesto
 clientcommandline: chirp.pb.o chirp.grpc.pb.o clientcommandline.o clientfunctionalities.o clientfunctionalities.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags
 
-servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o servicelayerfunctionalities.o servicelayerfunctionalities.h
-	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
-test: chirp.pb.o chirp.grpc.pb.o test.o clientfunctionalities.o clientfunctionalities.h servicelayerfunctionalities.o servicelayerfunctionalities.h
+servicelayer: chirp.pb.o chirp.grpc.pb.o servicelayer.o clientforkeyvaluestore.o clientforkeyvaluestore.h servicelayerfunctionalities.o servicelayerfunctionalities.h clientforkeyvaluestore.o clientforkeyvaluestore.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 keyvaluestoreinstance: keyvaluestoreinstance.o keyvaluestoreinstance.h
@@ -51,4 +49,4 @@ servicelayertest: chirp.pb.o chirp.grpc.pb.o servicelayertest.o servicelayerinst
 	$(PROTOC) $(PROTOS_PATH) --cpp_out=./
 
 clean:
-	rm -f *.o *.pb.cc *.pb.h backend clientcommandline servicelayer test keyvaluestoreinstance keyvaluestoretest servicelayertest
+	rm -f *.o *.pb.cc *.pb.h backend clientcommandline servicelayer keyvaluestoreinstance keyvaluestoretest servicelayertest clientforkeyvaluestore

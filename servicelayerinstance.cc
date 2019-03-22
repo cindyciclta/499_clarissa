@@ -25,26 +25,16 @@ bool ServiceLayerInstance::RegisterUser(const std::string &username) {
 bool ServiceLayerInstance::Chirp(const std::string &username,
                                  const std::string &text,
                                  const std::string &parentid) {
-  std::time_t seconds = std::time(nullptr);
-  int64_t microseconds_since_epoch =
-      std::chrono::duration_cast<std::chrono::microseconds>(
-          std::chrono::system_clock::now().time_since_epoch())
-          .count();
 
-  /* Get next chirp id, and lock it! */
-  std::string next_chirp_ID;
-  {
-    std::lock_guard<std::mutex> lock(mymutex_);
-    auto fromget = kvstore->Get("chirps_");
-    if (fromget.size() == 0) {
-      next_chirp_ID = std::to_string(0);
-    } else {
-      int currchirpid = std::stoi(fromget[0]);
-      currchirpid++;
-      next_chirp_ID = std::to_string(currchirpid);
-    }
-    kvstore->Put("chirps_", next_chirp_ID);
+  /* Get TimeStamp */
+  std::time_t seconds;
+  int64_t microseconds_since_epoch;
+  SetTimeStamp(seconds, microseconds_since_epoch);
+  /* Check if chirp ID exist */
+  if (!CheckIfReplyIDExist(parentid)) {
+    return false;
   }
+
   /* Get User */
   chirp::User user;
   std::vector<std::string> fromget = kvstore->Get(username);
@@ -54,6 +44,10 @@ bool ServiceLayerInstance::Chirp(const std::string &username,
   std::string user_string_val = fromget[0];
   user.ParseFromString(user_string_val);
   std::string user_key;
+
+  /* Get next chirp id, and lock it! */
+  std::string next_chirp_ID = GetNextChirpID();
+  kvstore->Put("chirps_", next_chirp_ID);
 
   /* Add new Chirp to chirp::User */
   std::string chirp_string_value;
@@ -202,6 +196,7 @@ ServiceLayerInstance::Monitor(const std::string &username) {
 
   chirp::MonitorReply reply;
   chirp::Followers followers = user.followers();
+
   /*
     Continuously look through all user's followers, and their chirps. Keep
     all sent chirps in a set called chirpsent. Keep looking for new chirps with
@@ -273,4 +268,34 @@ void ServiceLayerInstance::SetChirpReply(chirp::Chirp *chirp,
   chirp::Timestamp *timestamp = new_chirp->mutable_timestamp();
   timestamp->set_seconds(chirp->timestamp().seconds());
   timestamp->set_useconds(chirp->timestamp().useconds());
+}
+
+bool ServiceLayerInstance::CheckIfReplyIDExist(std::string parent_id) {
+  if (parent_id != "") {
+    auto from_get_function = kvstore->Get("chirp" + parent_id);
+    if (from_get_function.size() == 0) {
+      return false;
+    }
+  }
+  return true;
+}
+void ServiceLayerInstance::SetTimeStamp(std::time_t &seconds,
+                                        int64_t &microseconds_since_epoch) {
+  seconds = std::time(nullptr);
+  microseconds_since_epoch =
+      std::chrono::duration_cast<std::chrono::microseconds>(
+          std::chrono::system_clock::now().time_since_epoch())
+          .count();
+}
+std::string ServiceLayerInstance::GetNextChirpID() {
+  auto from_get_function = kvstore->Get("chirps_");
+  std::string next_chirp_ID;
+  if (from_get_function.size() == 0) {
+    next_chirp_ID = std::to_string(0);
+  } else {
+    int curr_chirp_id = std::stoi(from_get_function[0]);
+    curr_chirp_id++;
+    next_chirp_ID = std::to_string(curr_chirp_id);
+  }
+  return next_chirp_ID;
 }
