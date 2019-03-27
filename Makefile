@@ -31,13 +31,13 @@ clientcommandline: chirp.pb.o chirp.grpc.pb.o commandline/clientcommandline.o co
 servicelayer: chirp.pb.o chirp.grpc.pb.o service/servicelayer.o service/servicelayerfunctionalities.o service/servicelayerfunctionalities.h service/clientforkeyvaluestore.o service/clientforkeyvaluestore.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-keyvaluestoreinstance: kvstore/keyvaluestoreinstance.o kvstore/keyvaluestoreinstance.h
-	g++ -std=c++11 -c -o kvstore/keyvaluestoreinstance.o kvstore/keyvaluestoreinstance.cc
+keyvaluestoreinstance: kvstore/test/keyvaluestoreinstance.o kvstore/test/keyvaluestoreinstance.h
+	g++ -std=c++11 -c -o kvstore/test/keyvaluestoreinstance.o kvstore/test/keyvaluestoreinstance.cc
 
-keyvaluestoretest: kvstore/keyvaluestoretest.o kvstore/keyvaluestoreinstance.o kvstore/keyvaluestoreinstance.h
+keyvaluestoretest: kvstore/test/keyvaluestoretest.o kvstore/test/keyvaluestoreinstance.o kvstore/test/keyvaluestoreinstance.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
-servicelayertest: chirp.pb.o chirp.grpc.pb.o service/servicelayertest.o service/servicelayerinstance.o service/servicelayerinstance.h kvstore/keyvaluestoreinstance.o kvstore/keyvaluestoreinstance.h
+servicelayertest: chirp.pb.o chirp.grpc.pb.o service/test/servicelayertest.o service/test/servicelayerinstance.o service/test/servicelayerinstance.h kvstore/test/keyvaluestoreinstance.o kvstore/test/keyvaluestoreinstance.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 .PRECIOUS: %.grpc.pb.cc

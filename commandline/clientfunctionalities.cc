@@ -68,9 +68,10 @@ void ClientFunctionalities::read(const std::string &chirp_id) {
   std::multimap<std::string, std::string> mymap;
 
   for (int i = 0; i < reply.chirps_size(); i++) {
-    chirp::Chirp c = reply.chirps(i);
-    std::time_t seconds = c.timestamp().seconds();
-    std::cout << "[" << c.username() << "]: " << c.text() << std::endl;
+    chirp::Chirp current_chirp = reply.chirps(i);
+    std::time_t seconds = current_chirp.timestamp().seconds();
+    std::cout << "[" << current_chirp.username()
+              << "]: " << current_chirp.text() << std::endl;
   }
 
   if (status.ok()) {

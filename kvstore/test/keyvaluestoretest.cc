@@ -37,7 +37,7 @@ TEST(PutTest, ExistingKey) {
 }
 
 /*
-  Test Get() into kvstore
+  Test Get() from kvstore
 */
 
 TEST(GetTest, PutOneKey) {
@@ -47,7 +47,7 @@ TEST(GetTest, PutOneKey) {
   EXPECT_EQ("user1object", getValue[0]);
 }
 /*
-  Test Put(): Multiple keys
+  Test Get(): Multiple keys
 */
 TEST(GetTest, MultipleKeys) {
   KeyValueStoreInstance kvstore;
@@ -60,7 +60,7 @@ TEST(GetTest, MultipleKeys) {
 }
 
 /*
-  Test Put(): Replacing existing key
+  Test Get(): Putting an existing key and getting it
 */
 TEST(GetTest, ExistingKey) {
   KeyValueStoreInstance kvstore;
@@ -83,7 +83,7 @@ TEST(DeleteTest, SimpleTest) {
   EXPECT_EQ(0, getValue2.size());
 }
 /*
-  Test Delete() twice
+  Test Delete() an already deleted item
 */
 TEST(DeleteTest, DuplicateTest) {
   KeyValueStoreInstance kvstore;

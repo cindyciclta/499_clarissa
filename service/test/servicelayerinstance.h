@@ -3,8 +3,8 @@
 #include <queue>
 #include <thread>
 
-#include "../chirp.grpc.pb.h"
-#include "../kvstore/keyvaluestoreinstance.h"
+#include "../../chirp.grpc.pb.h"
+#include "../../kvstore/test/keyvaluestoreinstance.h"
 
 /*
   This class is to test the service layer functionalities. It does not
