@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 
-#include "../kvstore/keyvaluestoreinstance.h"
+#include "../../kvstore/test/keyvaluestoreinstance.h"
 #include "servicelayerinstance.h"
 
 /*

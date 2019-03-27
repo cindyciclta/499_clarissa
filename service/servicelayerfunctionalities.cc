@@ -250,7 +250,7 @@ Status ServerForCommandLineClient::monitor(
   }
 
   std::set<std::string> chirpsent;
-  chirp::User user; // Main User
+  chirp::User user; /* Main User */
   user.ParseFromString(from_get_function[0]);
 
   chirp::MonitorReply reply;
@@ -295,6 +295,7 @@ Status ServerForCommandLineClient::monitor(
   }
   return Status::OK;
 }
+
 /*
   Below: Private Functions Implementations
 */
