@@ -22,7 +22,7 @@ vpath %.proto $(PROTOS_PATH)
 
 all: backend clientcommandline servicelayertest keyvaluestoreinstance keyvaluestoretest servicelayer
 
-backend: chirp.pb.o chirp.grpc.pb.o kvstore/backend.o kvstore/keyvaluestoreserver.cc kvstore/keyvaluestoreserver.h
+backend: chirp.pb.o chirp.grpc.pb.o kvstore/backend.o kvstore/keyvaluestoreserver.cc kvstore/keyvaluestoreserver.h kvstore/test/keyvaluestoreinstance.o kvstore/test/keyvaluestoreinstance.h
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest
 
 clientcommandline: chirp.pb.o chirp.grpc.pb.o commandline/clientcommandline.o commandline/clientfunctionalities.o commandline/clientfunctionalities.h

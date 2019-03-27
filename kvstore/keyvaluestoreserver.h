@@ -12,6 +12,8 @@
 #include "../chirp.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
 
+#include "test/keyvaluestoreinstance.h"
+
 using chirp::DeleteReply;
 using chirp::DeleteRequest;
 using chirp::GetReply;
@@ -62,18 +64,7 @@ private:
     messages) stores user's info (chirp::User), chirps (chirp::Chirp), reply
     chirps (chirp::Chirp) respectively.
   */
-  std::unordered_map<std::string, std::string> data_;
-  /*
-    Mutex to safely lock threads/clients from accessing the map, data_, at the
-    same time
-  */
-  std::mutex mymutex_;
-  /*
-    Helper function for put() function. It will replace the value with an
-    existing key, or put a new key in
-  */
-  void addkey(const std::string &key, const std::string &value);
-  bool deletekeyhelper(const std::string &key);
+  KeyValueStoreInstance kvstore_;
 };
 
 #endif // CHIRP_IMPL_H
