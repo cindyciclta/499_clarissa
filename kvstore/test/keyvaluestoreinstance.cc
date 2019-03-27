@@ -22,6 +22,7 @@ std::vector<std::string> KeyValueStoreInstance::Get(const std::string &key) {
 }
 
 bool KeyValueStoreInstance::DeleteKey(const std::string &key) {
+  std::lock_guard<std::mutex> lock(mymutex_);
   auto it = data_.find(key);
   if (it != data_.end()) {
     data_.erase(it);
