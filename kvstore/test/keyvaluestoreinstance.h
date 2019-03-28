@@ -1,5 +1,5 @@
-#ifndef KEYVALUESTOREINSTANCE_H
-#define KEYVALUESTOREINSTANCE_H
+#ifndef KVSTORE_TEST_KEYVALUESTOREINSTANCE_H
+#define KVSTORE_TEST_KEYVALUESTOREINSTANCE_H
 #include <iostream>
 #include <map>
 #include <memory>
@@ -8,11 +8,12 @@
 #include <unordered_map>
 #include <vector>
 /*
-  KeyValueStoreInstance class is solely for testing only. This is testing the
-  class in keyvaluestoreserver.cc.
+  KeyValueStoreInstance class is used for testing purposes and also a
+  intermediary for keyvaluestoreserver.cc (this will a private data member in
+  keyvaluestoreserver.cc).
 */
 class KeyValueStoreInstance {
-public:
+ public:
   KeyValueStoreInstance(){};  /* Constructor */
   ~KeyValueStoreInstance(){}; /* Deconstructor */
   /*
@@ -34,12 +35,12 @@ public:
   */
   std::string GetFromMap(const std::string &key);
 
-private:
+ private:
   /*
     Attempt to store all data in this Map. The key will be std::string of
-    "<username>", "chirp<ID>", or "reply<ID>". The values are serialized proto
-    messages: user's info (chirp::User), chirps (chirp::Chirp), reply
-    chirps (chirp::Chirp) respectively.
+    "{username}", "chirp<ID>", or "reply<ID>". The values are serialized proto
+    messages that stores user's info (chirp::User), chirps (chirp::Chirp), and
+    reply chirps (chirp::ChirpReplies) respectively.
   */
   std::unordered_map<std::string, std::string> data_;
   /*
@@ -48,4 +49,4 @@ private:
   */
   std::mutex mymutex_;
 };
-#endif
+#endif /*KVSTORE_TEST_KEYVALUESTOREINSTANCE_H */

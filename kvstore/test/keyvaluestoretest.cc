@@ -9,9 +9,12 @@
 TEST(PutTest, PutOneKey) {
   KeyValueStoreInstance kvstore;
   kvstore.Put("user1", "user1object");
-  auto getValue = kvstore.GetFromMap("user1");
+  auto getValue =
+      kvstore.GetFromMap("user1"); /* Uses GetFromMap, which is a getter for the
+                                      map. Get() is not tested here. */
   EXPECT_EQ("user1object", getValue);
 }
+
 /*
   Test Put(): Multiple keys
 */
@@ -39,13 +42,13 @@ TEST(PutTest, ExistingKey) {
 /*
   Test Get() from kvstore
 */
-
 TEST(GetTest, PutOneKey) {
   KeyValueStoreInstance kvstore;
   kvstore.Put("user1", "user1object");
   auto getValue = kvstore.Get("user1");
   EXPECT_EQ("user1object", getValue[0]);
 }
+
 /*
   Test Get(): Multiple keys
 */
@@ -69,6 +72,7 @@ TEST(GetTest, ExistingKey) {
   auto getValue = kvstore.Get("user1");
   EXPECT_EQ("user2object", getValue[0]);
 }
+
 /*
   Test Delete()
 */
@@ -82,6 +86,7 @@ TEST(DeleteTest, SimpleTest) {
   auto getValue2 = kvstore.Get("user1");
   EXPECT_EQ(0, getValue2.size());
 }
+
 /*
   Test Delete() an already deleted item
 */

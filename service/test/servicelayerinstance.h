@@ -1,5 +1,6 @@
-#ifndef SERVICELAYERINSTANCE_H
-#define SERVICELAYERINSTANCE_H
+#ifndef SERVICE_TEST_SERVICELAYERINSTANCE_H
+#define SERVICE_TEST_SERVICELAYERINSTANCE_H
+
 #include <queue>
 #include <thread>
 
@@ -12,7 +13,7 @@
   KeyValueStoreServer class that goes over gRPC.
 */
 class ServiceLayerInstance {
-public:
+ public:
   ServiceLayerInstance(KeyValueStoreInstance *kv_instance);
   ~ServiceLayerInstance(){};
   bool RegisterUser(const std::string &username);
@@ -50,7 +51,7 @@ public:
   */
   void SetChirpReply(chirp::Chirp *chirp, chirp::ChirpReply *response);
 
-private:
+ private:
   KeyValueStoreInstance *kvstore; /* Key Value Store for Testing purpose */
   /*
     Mutex to lock chirps_ to ensure there is no duplicated chirp id.
@@ -69,4 +70,4 @@ private:
   */
   std::string GetNextChirpID();
 };
-#endif
+#endif /* SERVICE_TEST_SERVICELAYERINSTANCE_H*/

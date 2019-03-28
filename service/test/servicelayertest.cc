@@ -16,7 +16,6 @@ TEST(RegisterUser, SimpleTest) {
   chirp::User user_ = s_layer.StringToUser(uservalue[0]);
   EXPECT_EQ(user_.username(), "user1");
 }
-
 /*
   Add existing username
 */
@@ -32,7 +31,6 @@ TEST(RegisterUser, DuplicatedUserTest) {
   bool success = s_layer.RegisterUser("user1");
   EXPECT_EQ(false, success);
 }
-
 /*
   Add multiple users
 */
@@ -104,7 +102,6 @@ TEST(ToFollow, UserDoesntExistTest) {
 
   EXPECT_EQ(false, result);
 }
-
 /*
   Following the same user twice should not add duplicates
 */
@@ -127,7 +124,6 @@ TEST(ToFollow, FollowSameUserTwice) {
   EXPECT_EQ(user_.followers().username_size(), 1);
   EXPECT_EQ(user_.followers().username(0), "user1");
 }
-
 /*
   Following multiple different users
 */
@@ -151,7 +147,6 @@ TEST(ToFollow, MultipleUsers) {
   EXPECT_EQ(user_.followers().username(0), "user1");
   EXPECT_EQ(user_.followers().username(1), "user3");
 }
-
 /*
   User having a simple chirp, no reply
 */
@@ -172,7 +167,6 @@ TEST(ChirpTest, SimpleTest) {
   EXPECT_EQ(chirp_.username(), "user1");
   EXPECT_EQ(chirp_.text(), "testing this chirp");
 }
-
 /*
   Chirp::User doesn't exist
 */
@@ -189,7 +183,6 @@ TEST(ChirpTest, UserDoesntExistTest) {
   bool response = s_layer.Chirp("userdontexist", "testing this chirp", "");
   EXPECT_EQ(response, false);
 }
-
 /*
   User chirping more than once, with reply
 */
@@ -216,7 +209,6 @@ TEST(ChirpTest, MultipleChirps) {
   EXPECT_EQ(chirp_.username(), "user1");
   EXPECT_EQ(chirp_.text(), "second chirp test");
 }
-
 /*
   User Trying to reply to a chirp id that doesn't exist
 */
@@ -233,7 +225,6 @@ TEST(ChirpTest, ReplyDoesntExistTest) {
   bool response = s_layer.Chirp("user1", "testing this chirp", "1");
   EXPECT_EQ(response, false);
 }
-
 /*
   User can read a chirp thread (Multiple chirps in one thread)
 */
@@ -257,7 +248,6 @@ TEST(ReadTest, SimpleTest) {
   EXPECT_EQ("second chirp test", vector_of_chirps[1].text());
   EXPECT_EQ("replying to thread", vector_of_chirps[2].text());
 }
-
 /*
   User trying to read something that doesn't exist
 */
@@ -273,7 +263,6 @@ TEST(ReadTest, NullTest) {
   auto vector_of_chirps = s_layer.Read("1");
   EXPECT_EQ(0, vector_of_chirps.size());
 }
-
 /*
   User able to read multiple different threads
 */
@@ -304,7 +293,6 @@ TEST(ReadTest, MultipleThreads) {
   EXPECT_EQ("Separate thread", vector_of_chirps[0].text());
   EXPECT_EQ("reply to second thread ", vector_of_chirps[1].text());
 }
-
 /*
   User able to read a more complex thread.
 */
@@ -334,7 +322,6 @@ TEST(ReadTest, ComplexThreads) {
   EXPECT_EQ("reply to second thread ", vector_of_chirps[4].text());
   EXPECT_EQ("complex thread ", vector_of_chirps[5].text());
 }
-
 /*
   Helper Function for Monitor Function
 */
@@ -347,7 +334,6 @@ void RunMonitorAutomaticChirpGenerator(KeyValueStoreInstance *kv,
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
   }
 }
-
 /*
   Monitor test: create another thread that acts as a user chirping.
 */
@@ -362,7 +348,6 @@ TEST(MonitorTest, SimpleTest) {
   second.join();
   EXPECT_NE(0, recieved_monitor_chirp.size());
 }
-
 /*
   Monitor test: create another thread that acts as two users chirping
 */

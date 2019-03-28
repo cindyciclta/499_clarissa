@@ -14,7 +14,6 @@ Status KeyValueStoreServer::get(
   bool found = false;
 
   while (stream->Read(&request)) {
-    // auto it = data_.find(request.key());
     auto vector_from_get = kvstore_.Get(request.key());
     if (vector_from_get.size() > 0) {
       GetReply reply;

@@ -25,7 +25,6 @@ bool ServiceLayerInstance::RegisterUser(const std::string &username) {
 bool ServiceLayerInstance::Chirp(const std::string &username,
                                  const std::string &text,
                                  const std::string &parentid) {
-
   /* Get TimeStamp */
   std::time_t seconds;
   int64_t microseconds_since_epoch;
@@ -88,7 +87,7 @@ bool ServiceLayerInstance::Chirp(const std::string &username,
       replies.SerializeToString(&reply_chirp_string_value);
     }
     kvstore->Put("reply" + parentid,
-                 reply_chirp_string_value); // Add reply<ID> to backend
+                 reply_chirp_string_value);  // Add reply<ID> to backend
   }
   return true;
 }
@@ -129,11 +128,10 @@ bool ServiceLayerInstance::Follow(const std::string &username,
   return true;
 }
 
-std::vector<chirp::Chirp>
-ServiceLayerInstance::Read(const std::string &chirpid) {
-
+std::vector<chirp::Chirp> ServiceLayerInstance::Read(
+    const std::string &chirpid) {
   std::vector<std::string> fromget = kvstore->Get("chirp" + chirpid);
-  std::vector<chirp::Chirp> chirp_to_send; // For sorting by timestamp
+  std::vector<chirp::Chirp> chirp_to_send;  // For sorting by timestamp
   if (fromget.size() == 0) {
     return chirp_to_send;
   }
@@ -172,9 +170,8 @@ ServiceLayerInstance::Read(const std::string &chirpid) {
   return chirp_to_send;
 }
 
-std::vector<chirp::Chirp>
-ServiceLayerInstance::Monitor(const std::string &username) {
-
+std::vector<chirp::Chirp> ServiceLayerInstance::Monitor(
+    const std::string &username) {
   /* Get Current TimeStamp */
   std::time_t seconds = std::time(nullptr);
   int64_t seconds_since_epoch = static_cast<int64_t>(seconds);
@@ -249,8 +246,8 @@ chirp::Chirp ServiceLayerInstance::ConvertToChirp(std::string byte) {
   return chirp_;
 }
 
-chirp::ChirpReplies
-ServiceLayerInstance::ConvertToChirpReplies(std::string byte) {
+chirp::ChirpReplies ServiceLayerInstance::ConvertToChirpReplies(
+    std::string byte) {
   chirp::ChirpReplies replies;
   replies.ParseFromString(byte);
   return replies;

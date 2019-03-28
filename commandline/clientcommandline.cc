@@ -1,5 +1,5 @@
-#include <thread>
 #include <unistd.h>
+#include <thread>
 
 #define STRIP_FLAG_HELP 1
 #include <gflags/gflags.h>
