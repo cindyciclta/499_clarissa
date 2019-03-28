@@ -11,7 +11,6 @@ void ClientForKeyValueStore::put(const std::string &key,
   ClientContext context;
   Status status = stub_->put(&context, request, &reply);
 }
-
 std::vector<std::string> ClientForKeyValueStore::get(const std::string &key) {
   std::vector<std::string> replies;
   chirp::GetRequest request;
@@ -33,7 +32,6 @@ std::vector<std::string> ClientForKeyValueStore::get(const std::string &key) {
 
   return replies;
 }
-
 void ClientForKeyValueStore::deletekey(const std::string &key) {
   chirp::DeleteRequest request;
   chirp::DeleteReply reply;

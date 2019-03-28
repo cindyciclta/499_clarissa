@@ -14,7 +14,6 @@ void RunServer() {
 
   server->Wait();
 }
-
 int main(int argc, char **argv) {
   RunServer();
 

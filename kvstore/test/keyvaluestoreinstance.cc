@@ -10,7 +10,6 @@ void KeyValueStoreInstance::Put(const std::string &key,
     data_.emplace(key, value);
   }
 }
-
 std::vector<std::string> KeyValueStoreInstance::Get(const std::string &key) {
   std::lock_guard<std::mutex> lock(mymutex_);
   std::vector<std::string> respond;
@@ -20,7 +19,6 @@ std::vector<std::string> KeyValueStoreInstance::Get(const std::string &key) {
   }
   return respond;
 }
-
 bool KeyValueStoreInstance::DeleteKey(const std::string &key) {
   std::lock_guard<std::mutex> lock(mymutex_);
   auto it = data_.find(key);
@@ -30,7 +28,6 @@ bool KeyValueStoreInstance::DeleteKey(const std::string &key) {
   }
   return false;
 }
-
 std::string KeyValueStoreInstance::GetFromMap(const std::string &key) {
   auto it = data_.find(key);
   if (it != data_.end()) {

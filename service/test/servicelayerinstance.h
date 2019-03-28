@@ -14,13 +14,23 @@
 */
 class ServiceLayerInstance {
  public:
+  /* Constructor takes a KeyValueStoreInstance which stores the data */
   ServiceLayerInstance(KeyValueStoreInstance *kv_instance);
-  ~ServiceLayerInstance(){};
+  /* Deconstructor deleted kvstore instantiation */
+  ~ServiceLayerInstance();
+  /* RegisterUser takes in a username to put into kvstore */
   bool RegisterUser(const std::string &username);
+  /* Chirp takes in a username is associated to the chirp, the text, and
+   * optional, a parent id */
   bool Chirp(const std::string &username, const std::string &text,
              const std::string &parentid);
+  /* Follow takes in a username and another use that the username wants to
+   * follow */
   bool Follow(const std::string &username, const std::string &tofollow);
+  /* Read() takes in a chirpid and all the thread related to that chirp id */
   std::vector<chirp::Chirp> Read(const std::string &chirpid);
+  /* Monitor takes in a username and display realtime chirps from the user's
+   * followers */
   std::vector<chirp::Chirp> Monitor(const std::string &username);
 
   /*
