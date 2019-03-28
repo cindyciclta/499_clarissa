@@ -29,15 +29,9 @@ Run ./clientcommandline
 		$ sudo apt install g++
 		$ sudo apt install build-essential
 	6. Install homebrew: https://docs.brew.sh/Linuxbrew
-		$ sh -c "$(curl -fsSL https://raw.githubusercontent.com/Linuxbrew/install/master/install.sh)"
-		$ test -d ~/.linuxbrew && eval $(~/.linuxbrew/bin/brew shellenv)
-		$ test -d /home/linuxbrew/.linuxbrew && eval
-		$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
-		$ test -r ~/.bash_profile && echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.bash_profile
-		$ echo "eval \$($(brew --prefix)/bin/brew shellenv)" >>~/.profile
-	$ brew install hello
-	$ sudo apt-get install build-essential curl file git
-	7. Install protobuf: https://github.com/grpc/grpc/blob/master/BUILDING.md
+	7. $ brew install hello
+	8. $ sudo apt-get install build-essential curl file git
+	9. Install protobuf: https://github.com/grpc/grpc/blob/master/BUILDING.md
 		$ git clone https://github.com/protocolbuffers/protobuf.git
 		$ sudo apt-get install build-essential autoconf libtool pkg-config
 		$ sudo apt-get install libgflags-dev libgtest-dev
