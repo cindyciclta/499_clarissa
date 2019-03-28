@@ -6,7 +6,7 @@ ServiceLayerInstance::ServiceLayerInstance(KeyValueStoreInstance *kv_instance) {
     kvstore->Put("chirps_", std::to_string(0));
   }
 }
-
+ServiceLayerInstance::~ServiceLayerInstance() { delete kvstore; };
 bool ServiceLayerInstance::RegisterUser(const std::string &username) {
   auto from_get = kvstore->Get(username);
   if (from_get.size() != 0) {
@@ -21,7 +21,6 @@ bool ServiceLayerInstance::RegisterUser(const std::string &username) {
   kvstore->Put(username, to_string);
   return true;
 }
-
 bool ServiceLayerInstance::Chirp(const std::string &username,
                                  const std::string &text,
                                  const std::string &parentid) {
@@ -91,7 +90,6 @@ bool ServiceLayerInstance::Chirp(const std::string &username,
   }
   return true;
 }
-
 bool ServiceLayerInstance::Follow(const std::string &username,
                                   const std::string &tofollow) {
   if (username == tofollow) {
@@ -127,7 +125,6 @@ bool ServiceLayerInstance::Follow(const std::string &username,
   kvstore->Put(username, user_value);
   return true;
 }
-
 std::vector<chirp::Chirp> ServiceLayerInstance::Read(
     const std::string &chirpid) {
   std::vector<std::string> fromget = kvstore->Get("chirp" + chirpid);
@@ -169,7 +166,6 @@ std::vector<chirp::Chirp> ServiceLayerInstance::Read(
 
   return chirp_to_send;
 }
-
 std::vector<chirp::Chirp> ServiceLayerInstance::Monitor(
     const std::string &username) {
   /* Get Current TimeStamp */
@@ -228,7 +224,6 @@ std::vector<chirp::Chirp> ServiceLayerInstance::Monitor(
   }
   return chirps_to_send;
 }
-
 void ServiceLayerInstance::CopyChirp(chirp::Chirp *chirp_,
                                      const chirp::Chirp &reply_) {
   chirp_->set_username(reply_.username());
@@ -239,27 +234,23 @@ void ServiceLayerInstance::CopyChirp(chirp::Chirp *chirp_,
   time->set_seconds(reply_.timestamp().seconds());
   time->set_useconds(reply_.timestamp().useconds());
 }
-
 chirp::Chirp ServiceLayerInstance::ConvertToChirp(std::string byte) {
   chirp::Chirp chirp_;
   chirp_.ParseFromString(byte);
   return chirp_;
 }
-
 chirp::ChirpReplies ServiceLayerInstance::ConvertToChirpReplies(
     std::string byte) {
   chirp::ChirpReplies replies;
   replies.ParseFromString(byte);
   return replies;
 }
-
 chirp::User ServiceLayerInstance::StringToUser(std::string byte) {
   chirp::User user;
   user.ParseFromString(byte);
 
   return user;
 }
-
 void ServiceLayerInstance::SetChirpReply(chirp::Chirp *chirp,
                                          chirp::ChirpReply *response) {
   chirp::Chirp *new_chirp = response->mutable_chirp();
@@ -271,7 +262,6 @@ void ServiceLayerInstance::SetChirpReply(chirp::Chirp *chirp,
   timestamp->set_seconds(chirp->timestamp().seconds());
   timestamp->set_useconds(chirp->timestamp().useconds());
 }
-
 bool ServiceLayerInstance::CheckIfReplyIDExist(const std::string &parent_id) {
   if (parent_id != "") {
     auto from_get_function = kvstore->Get("chirp" + parent_id);
@@ -281,7 +271,6 @@ bool ServiceLayerInstance::CheckIfReplyIDExist(const std::string &parent_id) {
   }
   return true;
 }
-
 void ServiceLayerInstance::SetTimeStamp(std::time_t &seconds,
                                         int64_t &microseconds_since_epoch) {
   seconds = std::time(nullptr);
@@ -290,7 +279,6 @@ void ServiceLayerInstance::SetTimeStamp(std::time_t &seconds,
           std::chrono::system_clock::now().time_since_epoch())
           .count();
 }
-
 std::string ServiceLayerInstance::GetNextChirpID() {
   auto from_get_function = kvstore->Get("chirps_");
   std::string next_chirp_ID;

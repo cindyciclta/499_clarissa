@@ -6,7 +6,6 @@ Status KeyValueStoreServer::put(ServerContext *context,
   std::cout << "Sucessful: put()" << std::endl;
   return Status::OK;
 }
-
 Status KeyValueStoreServer::get(
     ServerContext *context,
     grpc::ServerReaderWriter<GetReply, GetRequest> *stream) {
@@ -28,7 +27,6 @@ Status KeyValueStoreServer::get(
   std::cout << "Sucessful: get()" << std::endl;
   return Status::OK;
 }
-
 Status KeyValueStoreServer::deletekey(ServerContext *context,
                                       const DeleteRequest *request,
                                       DeleteReply *response) {

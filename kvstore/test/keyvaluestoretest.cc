@@ -14,7 +14,6 @@ TEST(PutTest, PutOneKey) {
                                       map. Get() is not tested here. */
   EXPECT_EQ("user1object", getValue);
 }
-
 /*
   Test Put(): Multiple keys
 */
@@ -27,7 +26,6 @@ TEST(PutTest, MultipleKeys) {
   getValue = kvstore.GetFromMap("user2");
   EXPECT_EQ("user2object", getValue);
 }
-
 /*
   Test Put(): Replacing existing key
 */
@@ -48,7 +46,6 @@ TEST(GetTest, PutOneKey) {
   auto getValue = kvstore.Get("user1");
   EXPECT_EQ("user1object", getValue[0]);
 }
-
 /*
   Test Get(): Multiple keys
 */
@@ -61,7 +58,6 @@ TEST(GetTest, MultipleKeys) {
   getValue = kvstore.Get("user2");
   EXPECT_EQ("user2object", getValue[0]);
 }
-
 /*
   Test Get(): Putting an existing key and getting it
 */
@@ -72,7 +68,6 @@ TEST(GetTest, ExistingKey) {
   auto getValue = kvstore.Get("user1");
   EXPECT_EQ("user2object", getValue[0]);
 }
-
 /*
   Test Delete()
 */
@@ -86,7 +81,6 @@ TEST(DeleteTest, SimpleTest) {
   auto getValue2 = kvstore.Get("user1");
   EXPECT_EQ(0, getValue2.size());
 }
-
 /*
   Test Delete() an already deleted item
 */
@@ -100,7 +94,6 @@ TEST(DeleteTest, DuplicateTest) {
   getValue = kvstore.DeleteKey("user1");
   EXPECT_EQ(false, getValue);
 }
-
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

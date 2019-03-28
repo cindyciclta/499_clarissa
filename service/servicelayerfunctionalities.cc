@@ -9,7 +9,6 @@ ServerForCommandLineClient::ServerForCommandLineClient() {
     client_key.put("chirps_", std::to_string(0));
   }
 }
-
 Status ServerForCommandLineClient::registeruser(ServerContext *context,
                                                 const RegisterRequest *request,
                                                 RegisterReply *response) {
@@ -32,7 +31,6 @@ Status ServerForCommandLineClient::registeruser(ServerContext *context,
   client_key.put(request->username(), string_to_user_proto);
   return Status::OK;
 }
-
 Status ServerForCommandLineClient::follow(ServerContext *context,
                                           const FollowRequest *request,
                                           FollowReply *response) {
@@ -79,7 +77,6 @@ Status ServerForCommandLineClient::follow(ServerContext *context,
   client_key.put(request->username(), string_to_user_proto);
   return Status::OK;
 }
-
 Status ServerForCommandLineClient::chirp(ServerContext *context,
                                          const ChirpRequest *request,
                                          ChirpReply *response) {
@@ -165,7 +162,6 @@ Status ServerForCommandLineClient::chirp(ServerContext *context,
   }
   return Status::OK;
 }
-
 Status ServerForCommandLineClient::read(ServerContext *context,
                                         const ReadRequest *request,
                                         ReadReply *response) {
@@ -218,7 +214,6 @@ Status ServerForCommandLineClient::read(ServerContext *context,
   SortReadChirpByTimestamp(chirp_to_send, response, main_chirp);
   return Status::OK;
 }
-
 void ServerForCommandLineClient::SortReadChirpByTimestamp(
     std::vector<Chirp> &chirp_to_send, ReadReply *response,
     chirp::Chirp *main_chirp) {
@@ -235,7 +230,6 @@ void ServerForCommandLineClient::SortReadChirpByTimestamp(
     CopyChirp(c, i);
   }
 }
-
 Status ServerForCommandLineClient::monitor(
     ServerContext *context, const MonitorRequest *request,
     ::grpc::ServerWriter<::chirp::MonitorReply> *writer) {
@@ -301,7 +295,6 @@ Status ServerForCommandLineClient::monitor(
   }
   return Status::OK;
 }
-
 /*
   Below: Private Functions Implementations
 */
@@ -315,27 +308,23 @@ void ServerForCommandLineClient::CopyChirp(chirp::Chirp *chirp,
   time->set_seconds(chirp_to_copy.timestamp().seconds());
   time->set_useconds(chirp_to_copy.timestamp().useconds());
 }
-
 chirp::Chirp ServerForCommandLineClient::ConvertToChirp(std::string byte) {
   chirp::Chirp chirp;
   chirp.ParseFromString(byte);
   return chirp;
 }
-
 chirp::ChirpReplies ServerForCommandLineClient::ConvertToChirpReplies(
     std::string byte) {
   chirp::ChirpReplies replies;
   replies.ParseFromString(byte);
   return replies;
 }
-
 chirp::User ServerForCommandLineClient::StringToUser(std::string byte) {
   chirp::User user;
   user.ParseFromString(byte);
 
   return user;
 }
-
 void ServerForCommandLineClient::SetChirpReply(chirp::Chirp *chirp,
                                                chirp::ChirpReply *response) {
   chirp::Chirp *new_chirp = response->mutable_chirp();
@@ -347,7 +336,6 @@ void ServerForCommandLineClient::SetChirpReply(chirp::Chirp *chirp,
   timestamp->set_seconds(chirp->timestamp().seconds());
   timestamp->set_useconds(chirp->timestamp().useconds());
 }
-
 std::string ServerForCommandLineClient::GetNextChirpID(
     ClientForKeyValueStore &client_key) {
   auto from_get_function = client_key.get("chirps_");
@@ -362,7 +350,6 @@ std::string ServerForCommandLineClient::GetNextChirpID(
   client_key.put("chirps_", next_chirp_ID);
   return next_chirp_ID;
 }
-
 void ServerForCommandLineClient::SetTimeStamp(
     std::time_t &seconds, int64_t &microseconds_since_epoch) {
   seconds = std::time(nullptr);
@@ -371,7 +358,6 @@ void ServerForCommandLineClient::SetTimeStamp(
           std::chrono::system_clock::now().time_since_epoch())
           .count();
 }
-
 bool ServerForCommandLineClient::CheckIfReplyIDExist(
     ClientForKeyValueStore &client_key, const ChirpRequest *request) {
   if (request->parent_id() != "") {
