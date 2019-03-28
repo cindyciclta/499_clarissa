@@ -1,5 +1,5 @@
-#ifndef CLIENT_FUNCTIONALITIES_H_
-#define CLIENT_FUNCTIONALITIES_H_
+#ifndef COMMANDLINE_CLIENTFUNCTIONALITIES_H_
+#define COMMANDLINE_CLIENTFUNCTIONALITIES_H_
 #include <chrono>
 #include <ctime>
 #include <iostream>
@@ -9,9 +9,9 @@
 #include <string>
 #include <thread>
 
-#include "../chirp.grpc.pb.h"
 #include <grpcpp/client_context.h>
 #include <grpcpp/grpcpp.h>
+#include "../chirp.grpc.pb.h"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -36,7 +36,7 @@ using chirp::ServiceLayer;
   users are registering, sending a chirp, following other chirpers, and etc.
 */
 class ClientFunctionalities {
-public:
+ public:
   /*
     Constructor take takes in a shared pointer of Channel
   */
@@ -64,10 +64,10 @@ public:
   */
   void monitor(const std::string &username);
 
-private:
+ private:
   /*
     Unique ptr for all the stub
   */
   std::unique_ptr<chirp::ServiceLayer::Stub> stub_;
 };
-#endif // CLIENT_FUNCTIONALITIES_H_
+#endif /* CLIENT_FUNCTIONALITIES_H_*/

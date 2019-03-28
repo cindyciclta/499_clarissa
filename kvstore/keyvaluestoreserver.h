@@ -1,5 +1,5 @@
-#ifndef CHIRP_IMPL_H
-#define CHIRP_IMPL_H
+#ifndef KVSTORE_KEYVALUESTORESERVER_H
+#define KVSTORE_KEYVALUESTORESERVER_H
 
 #include <iostream>
 #include <map>
@@ -9,8 +9,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../chirp.grpc.pb.h"
 #include <grpcpp/grpcpp.h>
+#include "../chirp.grpc.pb.h"
 
 #include "test/keyvaluestoreinstance.h"
 
@@ -27,11 +27,11 @@ using grpc::ServerContext;
 using grpc::Status;
 using std::vector;
 /**
-    KeyValueStoreServer is to handle request from Service Layer and submit a
-response back
+    KeyValueStoreServer aka kvstore is to handle request from Service Layer and
+    submit a response back. This class acts as the methods to store all data.
 **/
 class KeyValueStoreServer final : public KeyValueStore::Service {
-public:
+ public:
   /*
     A client, ServerContext, calls this put() and sends a PutRequest & PutReply
     with. Put() takes the request from the client and inputs key and value into
@@ -57,14 +57,15 @@ public:
   Status deletekey(ServerContext *context, const DeleteRequest *request,
                    DeleteReply *response);
 
-private:
+ private:
   /*
-    Attempt to store all data in this Map. The key will be std::string of
-    "{username}", "chirp<ID>", or "reply<ID>". The values (serialized proto
-    messages) stores user's info (chirp::User), chirps (chirp::Chirp), reply
-    chirps (chirp::Chirp) respectively.
+    kvstore_ is a class that is an intermediary for this class. Ihis object will
+    store all the data. The key will be std::string of
+    "{username}", "chirp<ID>", or "reply<ID>". The values are serialized proto
+    messages that stores user's info (chirp::User), chirps (chirp::Chirp), and
+    reply chirps (chirp::ChirpReplies) respectively.
   */
   KeyValueStoreInstance kvstore_;
 };
 
-#endif // CHIRP_IMPL_H
+#endif /* KVSTORE_KEYVALUESTORESERVER_H */
