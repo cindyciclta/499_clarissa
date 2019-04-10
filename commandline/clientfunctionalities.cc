@@ -103,3 +103,22 @@ void ClientFunctionalities::monitor(const std::string &username) {
     std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
 }
+void ClientFunctionalities::stream(const std::string &hashtag) {
+  chirp::StreamRequest request;
+  request.set_hashtag(hashtag);
+  chirp::StreamReply reply;
+  ClientContext context;
+  std::unique_ptr<grpc::ClientReader<chirp::StreamReply>> reader(
+      stub_->stream(&context, request));
+  while (true) {
+    if (reader->Read(&reply)) {
+      for (int i = 0; i < reply.chirps_size(); i++) {
+        std::cout << "[" << reply.chirps(i).username()
+                  << "]: " << reply.chirps(i).text() << std::endl;
+      }
+    }
+    /* Polls for every half a second so that it doesn't have to keep polling too
+     * many times */
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+  }
+}

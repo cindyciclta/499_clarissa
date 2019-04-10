@@ -43,6 +43,8 @@ using chirp::ReadRequest;
 using chirp::RegisterReply;
 using chirp::RegisterRequest;
 using chirp::ServiceLayer;
+using chirp::StreamReply;
+using chirp::StreamRequest;
 
 using namespace std::chrono;
 using time_stamp = std::chrono::time_point<std::chrono::system_clock,
@@ -110,6 +112,15 @@ class ServerForCommandLineClient final : public ServiceLayer::Service {
   */
   Status monitor(ServerContext *context, const MonitorRequest *request,
                  ::grpc::ServerWriter<::chirp::MonitorReply> *writer);
+  /*
+  stream takes in a ServerContext the client that calls this function, as
+  well as, StreamRequest, and ::grpc::ServerWriter<::chirp::StreamReply>.
+  StreamRequest will allow stream() to find the specific hashtag in the
+  database. If found, stream will endlessly sends all the chirps from that
+  hashtag and sends new chirps in real-time.
+*/
+  Status stream(ServerContext *context, const StreamRequest *request,
+                ::grpc::ServerWriter<::chirp::StreamReply> *writer);
 
  private:
   /*

@@ -32,7 +32,8 @@ class ServiceLayerInstance {
   /* Monitor takes in a username and display realtime chirps from the user's
    * followers */
   std::vector<chirp::Chirp> Monitor(const std::string &username);
-
+  /* Stream takes in a hashtag and displays realtime chirps with that hashtag */
+  std::vector<chirp::Chirp> Stream(const std::string &hastag);
   /*
   The functions below are helper functions to serialize and parse objects
   this is made public so it can be tested in servicelayertest.cc

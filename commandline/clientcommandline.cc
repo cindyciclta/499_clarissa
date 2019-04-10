@@ -13,6 +13,7 @@ DEFINE_string(reply, "", "replies a chirp with a new chirp");
 DEFINE_string(follow, "", "follows another user");
 DEFINE_string(read, "", "reads the chirp thread starting at the given id");
 DEFINE_bool(monitor, false, "streams new chirps from those currently followed");
+DEFINE_string(stream, "", "Streams all new chirps containing ‘hashtag’");
 
 static bool ValidateUser(const char *flagname, const std::string &value);
 static bool ValidateChirp(const char *flagname, const std::string &value);
@@ -46,6 +47,9 @@ int main(int argc, char **argv) {
     }
     if (FLAGS_monitor) {
       client.monitor(FLAGS_user);
+    }
+    if (FLAGS_stream != "") {
+      client.stream(FLAGS_stream);
     }
   } else {
     std::cout << "Syntax Error. Please try again." << std::endl;

@@ -110,6 +110,8 @@ Status ServerForCommandLineClient::chirp(ServerContext *context,
   std::string next_chirp_ID = GetNextChirpID(client_key);
 
   /*Add new Chirp to chirp::User*/
+  /* TODO: Check for # in text and if so, put chirp in db under key -
+   * "hashtag#___" */
   chirp::Chirp *message;
   std::string convert_string_chirp_to_proto;
   {
@@ -290,6 +292,42 @@ Status ServerForCommandLineClient::monitor(
           }
         }
       }
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  }
+  return Status::OK;
+}
+
+Status ServerForCommandLineClient::stream(
+    ServerContext *context, const StreamRequest *request,
+    ::grpc::ServerWriter<::chirp::StreamReply> *writer) {
+  /* Get Current TimeStamp */
+  std::time_t seconds;
+  int64_t microseconds_since_epoch;
+  SetTimeStamp(seconds, microseconds_since_epoch);
+
+  ClientForKeyValueStore client_key(grpc::CreateChannel(
+      "localhost:50000", grpc::InsecureChannelCredentials()));
+
+  auto from_get_function = client_key.get("hashtag#" + request->hashtag());
+  if (from_get_function.size() == 0) {
+    return Status::CANCELLED;
+  }
+
+  std::set<std::string> chirpsent; /* Save all the id of chirps was sent */
+  chirp::Chirp chirp;
+  chirp.ParseFromString(from_get_function[0]);
+
+  chirp::StreamReply reply;
+  /*
+    Continuously look through in db for #. Keep all
+    sent chirps in a set called chirpsent to disallow sending duplicates. Keep
+    looking for new chirps with this while loop.
+  */
+  // TODO: Implement continous polling for new chirps from #hashtag
+  while (true) {
+    if (context->IsCancelled()) {
+      break;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   }
