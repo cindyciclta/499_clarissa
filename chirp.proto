@@ -84,12 +84,19 @@ message MonitorReply {
   Chirp chirp = 1;
 }
 
+message StreamRequest {
+  string hashtag = 1;
+}
+message StreamReply{
+  repeated Chirp chirps = 1;
+}
+
 message Username {
   string username = 1;
 }
 
 message Followers {
-  repeated string username = 1;  
+  repeated string username = 1;
 }
 
 message User {
@@ -100,7 +107,7 @@ message User {
 
 message ID {
   bytes id = 1;
-} 
+}
 
 message ChirpReplies {
   bytes parent_id = 1;
@@ -119,6 +126,7 @@ service ServiceLayer {
   rpc follow (FollowRequest) returns (FollowReply) {}
   rpc read (ReadRequest) returns (ReadReply) {}
   rpc monitor (MonitorRequest) returns (stream MonitorReply) {}
+  rpc stream (StreamRequest) returns (stream StreamReply) {}
 }
 
 

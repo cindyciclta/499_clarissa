@@ -367,6 +367,19 @@ TEST(MonitorTest, MultipleUsersTest) {
   EXPECT_NE(0, recieved_monitor_chirp.size());
 }
 
+/*
+  Stream test: not implemented enough to finish test yet
+*/
+TEST(StreamTest, SimpleTest) {
+  KeyValueStoreInstance *kvstore = new KeyValueStoreInstance;
+  ServiceLayerInstance s_layer(kvstore);
+  s_layer.RegisterUser("user1");
+  s_layer.RegisterUser("user2");
+  s_layer.Chirp("user1", " #test hello", "");
+  auto recieved_stream_chirp = s_layer.Stream("#test");
+  // EXPECT_NE(0, recieved_stream_chirp.size());
+}
+
 int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

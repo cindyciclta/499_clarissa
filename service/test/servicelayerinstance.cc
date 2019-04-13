@@ -224,6 +224,13 @@ std::vector<chirp::Chirp> ServiceLayerInstance::Monitor(
   }
   return chirps_to_send;
 }
+std::vector<chirp::Chirp> ServiceLayerInstance::Stream(
+    const std::string &hashtag) {
+  chirp::StreamReply reply;
+
+  std::set<std::string> chirpsent;
+}
+
 void ServiceLayerInstance::CopyChirp(chirp::Chirp *chirp_,
                                      const chirp::Chirp &reply_) {
   chirp_->set_username(reply_.username());

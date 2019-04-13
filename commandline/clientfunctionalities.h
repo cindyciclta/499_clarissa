@@ -63,6 +63,10 @@ class ClientFunctionalities {
     Read all the chirps that their followers chirps in real-time
   */
   void monitor(const std::string &username);
+  /*
+    Streams all new chirps containing ‘hashtag’
+  */
+  void stream(const std::string &hashtag);
 
  private:
   /*
