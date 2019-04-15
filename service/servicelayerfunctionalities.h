@@ -10,6 +10,7 @@
 #include <string>
 #include <thread>
 
+#include <glog/logging.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/grpcpp.h>
 #include "../chirp.grpc.pb.h"

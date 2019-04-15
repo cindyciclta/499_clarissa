@@ -88,6 +88,36 @@ bool ServiceLayerInstance::Chirp(const std::string &username,
     kvstore->Put("reply" + parentid,
                  reply_chirp_string_value);  // Add reply<ID> to backend
   }
+  /* Check for hashtag in chirp - if so add to KVS as a hashtag chirp */
+  std::size_t start = text.find(" #");
+  if (start != -1) {
+    std::string hashtag = text.substr(start + 1);  // +1 gets rid of space
+    std::size_t end = hashtag.find(" ");           // cut off at end of hashtag
+    hashtag = hashtag.substr(0, end);
+
+    chirp::Hashtag tag;
+    std::vector<std::string> from_get_function =
+        kvstore->Get("hashtag" + hashtag);
+    if (from_get_function.size() != 0) {
+      std::string getValue = from_get_function[0];
+      tag.ParseFromString(getValue);
+    }
+
+    chirp::Chirp *new_message;
+    std::string hashtag_chirp;
+    {
+      new_message = tag.add_chirps();
+      new_message->set_username(username);
+      new_message->set_text(text);
+      new_message->set_id(next_chirp_ID);
+      chirp::Timestamp *timestamp = new_message->mutable_timestamp();
+      timestamp->set_seconds(static_cast<int64_t>(seconds));
+      timestamp->set_useconds(microseconds_since_epoch);
+      new_message->set_parent_id(parentid);
+      new_message->SerializeToString(&hashtag_chirp);
+    }
+    kvstore->Put("hashtag" + hashtag, hashtag_chirp);
+  }
   return true;
 }
 bool ServiceLayerInstance::Follow(const std::string &username,
@@ -245,6 +275,18 @@ chirp::Chirp ServiceLayerInstance::ConvertToChirp(std::string byte) {
   chirp::Chirp chirp_;
   chirp_.ParseFromString(byte);
   return chirp_;
+}
+std::vector<chirp::Chirp> ServiceLayerInstance::ConvertToHashtag(
+    std::string byte) {
+  chirp::Hashtag hashtag_;
+  hashtag_.ParseFromString(byte);
+
+  std::vector<chirp::Chirp> chirps;
+
+  for (int i = 0; i < hashtag_.chirps_size(); i++) {
+    chirps.push_back(hashtag_.chirps(i));
+  }
+  return chirps;
 }
 chirp::ChirpReplies ServiceLayerInstance::ConvertToChirpReplies(
     std::string byte) {

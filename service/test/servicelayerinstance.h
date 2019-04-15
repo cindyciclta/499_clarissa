@@ -44,10 +44,15 @@ class ServiceLayerInstance {
   */
   chirp::Chirp ConvertToChirp(std::string byte);
   /*
+  Converts serialized string to chirp::Hashtag
+  */
+  std::vector<chirp::Chirp> ConvertToHashtag(std::string byte);
+  /*
   Converts serialized string to chirp::ChirpReplies (which is a list of
   replies to the same chirp<ID>)
   */
   chirp::ChirpReplies ConvertToChirpReplies(std::string byte);
+
   /*
     Copy chirps, "chirp_" is an empty chirp, and "reply_" is copying into
     "chirp"
